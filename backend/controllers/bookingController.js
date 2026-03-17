@@ -1,0 +1,282 @@
+const Booking = require('../models/Booking');
+const Car = require('../models/Car');
+const User = require('../models/User');
+const PreliminaryBooking = require('../models/PreliminaryBooking');
+const nodemailer = require('nodemailer');
+
+// Email transporter setup
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Mock distance calculation (replace with Google Maps API)
+const calculateDistance = (pickup, drop, places = []) => {
+  // Simple mock calculation - in production, use Google Maps Distance Matrix API
+  const baseDistance = Math.random() * 50 + 10; // 10-60 km
+  const additionalDistance = places.length * (Math.random() * 20 + 5); // 5-25 km per place
+  return Math.round(baseDistance + additionalDistance);
+};
+
+// Create booking
+const createBooking = async (req, res) => {
+  try {
+    const {
+      carId,
+      pickupLocation,
+      dropLocation,
+      placesToVisit,
+      pickupDateTime,
+      totalDistance,
+      baseAmount,
+      totalAmount,
+      paymentMethod,
+      paymentStatus
+    } = req.body;
+
+    // Check car availability
+    const car = await Car.findById(carId);
+    if (!car || !car.isAvailable) {
+      return res.status(400).json({ message: 'Car not available' });
+    }
+
+    const booking = await Booking.create({
+      customerId: req.user.id,
+      carId,
+      pickupLocation,
+      dropLocation,
+      placesToVisit: placesToVisit || [],
+      pickupDateTime,
+      totalDistance,
+      baseAmount,
+      totalAmount,
+      paymentMethod: paymentMethod || 'cash',
+      paymentStatus: paymentStatus || 'pending'
+    });
+
+    await booking.populate(['carId', 'customerId']);
+
+    res.status(201).json({
+      message: 'Booking created successfully',
+      booking
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get user bookings
+const getUserBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ customerId: req.user.id })
+      .populate('carId', 'name number model')
+      .populate('driverId', 'name phone')
+      .sort({ createdAt: -1 });
+
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get driver bookings
+const getDriverBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find({ driverId: req.user.id })
+      .populate('customerId', 'name phone')
+      .populate('carId', 'name number model')
+      .sort({ createdAt: -1 });
+
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update booking status (driver)
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { status } = req.body;
+
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      driverId: req.user.id
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    res.json({
+      message: 'Booking status updated successfully',
+      booking
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all bookings (admin)
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate('customerId', 'name email phone')
+      .populate('driverId', 'name email phone')
+      .populate('carId', 'name number model')
+      .sort({ createdAt: -1 });
+
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Assign driver to booking (admin)
+const assignDriver = async (req, res) => {
+  try {
+    const { bookingId } = req.params;
+    const { driverId } = req.body;
+
+    // Check if driver exists and is available
+    const driver = await User.findOne({
+      _id: driverId,
+      role: 'driver',
+      isActive: true
+    });
+
+    if (!driver) {
+      return res.status(400).json({ message: 'Driver not found or not available' });
+    }
+
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      { driverId, status: 'assigned' },
+      { new: true }
+    ).populate(['customerId', 'driverId', 'carId']);
+
+    res.json({
+      message: 'Driver assigned successfully',
+      booking
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Mock OTP storage (use Redis in production)
+const otpStore = new Map();
+
+const sendOTP = async (req, res) => {
+  try {
+    const { phone, name, email, pickupLocation, dropLocation, pickupDate, pickupTime } = req.body;
+    if (!phone || !name || !email || !pickupLocation || !dropLocation || !pickupDate || !pickupTime) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Store preliminary booking data
+    const preliminaryBooking = await PreliminaryBooking.create({
+      name,
+      phone,
+      email,
+      pickupLocation,
+      dropLocation,
+      pickupDate,
+      pickupTime
+    });
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    otpStore.set(phone, { otp, bookingId: preliminaryBooking._id });
+
+    // Send OTP via email
+    try {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: 'Car Rental Booking - OTP Verification',
+        html: `
+          <h2>Car Rental Booking OTP</h2>
+          <p>Hello ${name},</p>
+          <p>Your OTP for car rental booking is: <strong>${otp}</strong></p>
+          <p>This OTP is valid for 10 minutes.</p>
+          <hr>
+          <p><strong>Booking Details:</strong></p>
+          <p>From: ${pickupLocation}</p>
+          <p>To: ${dropLocation}</p>
+          <p>Date: ${pickupDate} at ${pickupTime}</p>
+        `
+      });
+      console.log(`OTP email sent to ${email}`);
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError);
+      // Fallback to console log
+      console.log(`\n=== OTP for ${email}: ${otp} ===\n`);
+    }
+
+    res.json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const verifyOTP = async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ message: 'Phone and OTP are required' });
+    }
+
+    const storedData = otpStore.get(phone);
+    if (storedData && storedData.otp === otp) {
+      // Mark preliminary booking as verified
+      await PreliminaryBooking.findByIdAndUpdate(storedData.bookingId, { isVerified: true });
+      otpStore.delete(phone);
+      res.json({ message: 'OTP verified successfully' });
+    } else {
+      res.status(400).json({ message: 'Invalid OTP' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const createPreliminaryBooking = async (req, res) => {
+  try {
+    const { name, phone, pickupLocation, dropLocation, pickupDate, pickupTime } = req.body;
+
+    const preliminaryBooking = await PreliminaryBooking.create({
+      name,
+      phone,
+      email,
+      pickupLocation,
+      dropLocation,
+      pickupDate,
+      pickupTime
+    });
+
+    res.status(201).json({
+      message: 'Preliminary booking created successfully',
+      bookingId: preliminaryBooking._id
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  createBooking,
+  getUserBookings,
+  getDriverBookings,
+  updateBookingStatus,
+  getAllBookings,
+  assignDriver,
+  sendOTP,
+  verifyOTP,
+  createPreliminaryBooking
+};

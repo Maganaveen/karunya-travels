@@ -1,0 +1,1 @@
+{\n  \"scripts\": {\n    \"seed\": \"node seeds/locationSeed.js\",\n    \"seed:locations\": \"node seeds/locationSeed.js\"\n  }\n}
