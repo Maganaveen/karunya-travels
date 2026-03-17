@@ -1,0 +1,634 @@
+/* StartJourney.css - Premium Edition */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.start-journey-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #f8fafc;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #0f172a;
+}
+
+/* --- Typography Utilities --- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    letter-spacing: -0.025em;
+    color: #0f172a;
+}
+
+.text-muted {
+    color: #64748b;
+}
+
+.text-primary {
+    color: #2563eb;
+}
+
+/* --- Hero Section --- */
+.journey-hero-section {
+    position: relative;
+    height: 350px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 2rem;
+    overflow: hidden;
+}
+
+.journey-hero-bg-overlay {
+    display: none;
+}
+
+.journey-hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    animation: heroFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.journey-hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: white;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+.journey-hero-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 400;
+    max-width: 650px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* --- Container --- */
+.journey-container {
+    max-width: 1280px;
+    margin: -80px auto 0;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 20;
+}
+
+/* --- Card Styles --- */
+.planner-card,
+.summary-card,
+.car-card-styled {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.planner-card {
+    background: white;
+}
+
+/* --- Header in Card --- */
+.card-header-styled {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.section-title i {
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 0.75rem;
+    border-radius: 12px;
+    font-size: 1.25rem;
+}
+
+/* --- Buttons --- */
+.toggle-plan-btn,
+.submit-btn-styled,
+.book-btn {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-plan-btn {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 0.75rem 1.5rem;
+    border-radius: 99px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-plan-btn:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+.toggle-plan-btn.active {
+    background: #2563eb;
+    color: white;
+}
+
+.submit-btn-styled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.submit-btn-styled:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+}
+
+/* --- Form Inputs Premium --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-group-styled label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.input-wrapper {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.input-icon-wrapper {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1.1rem;
+    pointer-events: none;
+    transition: color 0.3s;
+}
+
+.input-styled {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    /* Left padding for icon */
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.input-styled:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.input-styled:focus+.input-icon-wrapper,
+.input-wrapper:focus-within .input-icon-wrapper {
+    color: #2563eb;
+}
+
+/* --- Places Selection --- */
+.places-section-styled {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2.5rem 0;
+}
+
+.dropdown-trigger {
+    background: white;
+    border: 2px solid #e2e8f0;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dropdown-trigger:hover {
+    border-color: #cbd5e1;
+}
+
+.dropdown-trigger.active {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.dropdown-menu-styled {
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    border-radius: 16px;
+}
+
+/* --- Tourist Spots --- */
+.spot-checkbox-card {
+    position: relative;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.spot-checkbox-card:hover {
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+}
+
+.spot-checkbox-card.selected {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+.spot-checkbox-card input[type="checkbox"] {
+    margin-top: 0.25rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #2563eb;
+    cursor: pointer;
+}
+
+/* --- Summary --- */
+.summary-card {
+    border-top: 4px solid #2563eb;
+}
+
+.summary-stat {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.summary-stat .stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.summary-stat .stat-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #64748b;
+}
+
+/* --- Available Cars --- */
+.car-card-styled {
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.car-image-container {
+    height: 240px;
+    position: relative;
+}
+
+.car-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.car-card-styled:hover .car-image-container img {
+    transform: scale(1.08);
+}
+
+.car-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.car-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.car-specs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.spec-item {
+    background: #f8fafc;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.price-tag {
+    color: #0f172a;
+}
+
+.book-btn {
+    width: 100%;
+    background: #0f172a;
+    color: white;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-top: auto;
+}
+
+.book-btn:hover {
+    background: #1e293b;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.cars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.spots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.city-group {
+    margin-bottom: 2rem;
+}
+
+.city-group-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.places-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.places-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-xs {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline {
+    background: white;
+    border: 2px solid #e2e8f0;
+    color: #475569;
+}
+
+.btn-outline:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.multi-select-wrapper {
+    margin-top: 1rem;
+}
+
+.selected-spots-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.spot-tag {
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tourist-spots-block {
+    margin-top: 2rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.checkbox-label:hover {
+    background: #f8fafc;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #667eea;
+    cursor: pointer;
+}
+
+.textarea-styled {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.journey-form-styled {
+    margin-top: 2rem;
+}
+
+.cars-section {
+    margin-top: 3rem;
+}
+
+.cars-section .section-title {
+    text-align: center;
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.cars-section .section-title h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .print-invoice,
+    .print-invoice * {
+        visibility: visible;
+    }
+    
+    .print-invoice {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: white;
+        border-radius: 0;
+        box-shadow: none;
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .print-invoice button {
+        display: none !important;
+    }
+    
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+}
+
+/* Invoice Print Styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    .invoice-overlay,
+    .invoice-overlay * {
+        visibility: visible;
+    }
+    
+    .invoice-overlay {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 99999;
+    }
+}
