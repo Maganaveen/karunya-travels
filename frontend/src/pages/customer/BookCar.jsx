@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { carsAPI, bookingsAPI, locationsAPI } from '../../services/api';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 const BookCar = () => {
   const { carId } = useParams();

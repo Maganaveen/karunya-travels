@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { bookingsAPI } from '../../services/api';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 const DriverBookings = () => {
   const [bookings, setBookings] = useState([]);

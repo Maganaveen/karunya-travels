@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://karunya-travels-2.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({
@@ -15,6 +15,9 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+  if (config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
   }
   return config;
 });
@@ -37,6 +40,9 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
   register: (userData) => api.post('/auth/register', userData),
   getProfile: () => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  changePassword: (data) => api.put('/auth/change-password', data),
+  uploadAvatar: (formData) => api.post('/auth/upload-avatar', formData),
 };
 
 // Cars API
@@ -67,7 +73,7 @@ export const bookingsAPI = {
 export const driversAPI = {
   updateLocation: (locationData) => api.post('/drivers/location', locationData),
   getLocation: () => api.get('/drivers/location'),
-  updateAvailability: (isAvailable) => api.patch('/drivers/availability', { isAvailable }),
+  updateAvailability: (isAvailable, offlineReason) => api.patch('/drivers/availability', { isAvailable, offlineReason }),
   getAllDrivers: () => api.get('/drivers/all'),
 };
 

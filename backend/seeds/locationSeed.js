@@ -1,24 +1,5 @@
 const mongoose = require('mongoose');
-
-// Location Schema
-const locationSchema = new mongoose.Schema({
-  state: { type: String, required: true },
-  cities: [{ type: String, required: true }],
-  touristSpots: {
-    type: Map,
-    of: [{
-      name: { type: String, required: true },
-      distance: { type: Number, required: true },
-      type: { type: String, default: 'temple' },
-      coordinates: {
-        lat: Number,
-        lng: Number
-      }
-    }]
-  }
-});
-
-const Location = mongoose.model('Location', locationSchema);
+const Location = require('../models/Location');
 
 const seedData = [
   {
@@ -124,6 +105,13 @@ const seedData = [
         { name: 'Pykara Lake', distance: 20, type: 'lake', coordinates: { lat: 11.4422, lng: 76.5986 } },
         { name: 'Sim\'s Park (Coonoor)', distance: 20, type: 'park', coordinates: { lat: 11.3530, lng: 76.8020 } }
       ]],
+      ['Cuddalore', [
+        { name: 'Silver Beach', distance: 3, type: 'beach', coordinates: { lat: 11.7333, lng: 79.7833 } },
+        { name: 'Pichavaram Mangrove Forest', distance: 16, type: 'nature', coordinates: { lat: 11.4167, lng: 79.7833 } },
+        { name: 'Thiruvathigai Temple', distance: 12, type: 'temple', coordinates: { lat: 11.6500, lng: 79.6833 } },
+        { name: 'Fort St. David', distance: 5, type: 'fort', coordinates: { lat: 11.7167, lng: 79.7667 } },
+        { name: 'Pataleeswarar Temple', distance: 2, type: 'temple', coordinates: { lat: 11.7480, lng: 79.7714 } }
+      ]],
       ['Ramanathapuram', [
         { name: 'Ramanathaswamy Temple (Rameswaram)', distance: 55, type: 'temple', coordinates: { lat: 9.2881, lng: 79.3174 } },
         { name: 'Dhanushkodi', distance: 75, type: 'beach', coordinates: { lat: 9.1760, lng: 79.4140 } },
@@ -133,37 +121,118 @@ const seedData = [
   },
   {
     state: 'Kerala',
-    cities: ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Palakkad', 'Munnar', 'Alappuzha', 'Wayanad'],
+    cities: [
+      'Thiruvananthapuram', 'Kollam', 'Alappuzha', 'Pathanamthitta', 'Kottayam',
+      'Idukki', 'Ernakulam', 'Thrissur', 'Palakkad', 'Malappuram',
+      'Kozhikode', 'Wayanad', 'Kannur', 'Kasaragod'
+    ],
     touristSpots: new Map([
-      ['Kochi', [
-        { name: 'Chinese Fishing Nets', distance: 3, type: 'heritage', coordinates: { lat: 9.9312, lng: 76.2673 } },
-        { name: 'Fort Kochi', distance: 4, type: 'heritage', coordinates: { lat: 9.9650, lng: 76.2230 } },
-        { name: 'Mattancherry Palace', distance: 8, type: 'palace', coordinates: { lat: 9.9312, lng: 76.2573 } }
+      ['Thiruvananthapuram', [
+        { name: 'Sree Padmanabhaswamy Temple', distance: 3, type: 'temple', coordinates: { lat: 8.4826, lng: 76.9437 } },
+        { name: 'Kovalam Beach', distance: 16, type: 'beach', coordinates: { lat: 8.3988, lng: 76.9780 } },
+        { name: 'Varkala Beach', distance: 51, type: 'beach', coordinates: { lat: 8.7379, lng: 76.7163 } },
+        { name: 'Ponmudi', distance: 61, type: 'hill_station', coordinates: { lat: 8.7600, lng: 77.1100 } }
       ]],
-      ['Munnar', [
-        { name: 'Tea Gardens', distance: 5, type: 'nature', coordinates: { lat: 10.0889, lng: 77.0595 } },
-        { name: 'Mattupetty Dam', distance: 13, type: 'dam', coordinates: { lat: 10.1060, lng: 77.1230 } },
-        { name: 'Eravikulam National Park', distance: 8, type: 'park', coordinates: { lat: 10.2000, lng: 77.0333 } }
+      ['Kollam', [
+        { name: 'Ashtamudi Lake', distance: 5, type: 'nature', coordinates: { lat: 8.9500, lng: 76.5800 } },
+        { name: 'Jatayu Earths Center', distance: 62, type: 'attraction', coordinates: { lat: 8.8667, lng: 76.8833 } },
+        { name: 'Munroe Island', distance: 27, type: 'nature', coordinates: { lat: 8.9833, lng: 76.5500 } }
       ]],
       ['Alappuzha', [
         { name: 'Alappuzha Beach', distance: 2, type: 'beach', coordinates: { lat: 9.4900, lng: 76.3160 } },
-        { name: 'Backwaters', distance: 5, type: 'nature', coordinates: { lat: 9.5000, lng: 76.3500 } }
+        { name: 'Backwaters', distance: 5, type: 'nature', coordinates: { lat: 9.5000, lng: 76.3500 } },
+        { name: 'Kuttanad', distance: 16, type: 'nature', coordinates: { lat: 9.3500, lng: 76.4200 } },
+        { name: 'Marari Beach', distance: 13, type: 'beach', coordinates: { lat: 9.5833, lng: 76.2833 } }
+      ]],
+      ['Pathanamthitta', [
+        { name: 'Sabarimala Temple', distance: 72, type: 'temple', coordinates: { lat: 9.4361, lng: 77.0811 } },
+        { name: 'Gavi', distance: 96, type: 'nature', coordinates: { lat: 9.4000, lng: 77.1500 } }
+      ]],
+      ['Kottayam', [
+        { name: 'Kumarakom', distance: 16, type: 'nature', coordinates: { lat: 9.5922, lng: 76.4308 } },
+        { name: 'Illikkal Kallu', distance: 58, type: 'nature', coordinates: { lat: 9.7833, lng: 76.8167 } }
+      ]],
+      ['Idukki', [
+        { name: 'Munnar Tea Estates', distance: 50, type: 'nature', coordinates: { lat: 10.0889, lng: 77.0595 } },
+        { name: 'Eravikulam National Park', distance: 60, type: 'park', coordinates: { lat: 10.2000, lng: 77.0333 } },
+        { name: 'Periyar Wildlife Sanctuary (Thekkady)', distance: 80, type: 'park', coordinates: { lat: 9.4667, lng: 77.1667 } },
+        { name: 'Vagamon', distance: 45, type: 'hill_station', coordinates: { lat: 9.6833, lng: 76.9000 } }
+      ]],
+      ['Ernakulam', [
+        { name: 'Chinese Fishing Nets', distance: 15, type: 'heritage', coordinates: { lat: 9.9678, lng: 76.2430 } },
+        { name: 'Fort Kochi', distance: 13, type: 'heritage', coordinates: { lat: 9.9650, lng: 76.2230 } },
+        { name: 'Mattancherry Palace', distance: 14, type: 'palace', coordinates: { lat: 9.9312, lng: 76.2573 } }
+      ]],
+      ['Thrissur', [
+        { name: 'Athirappilly Waterfalls', distance: 60, type: 'waterfall', coordinates: { lat: 10.2856, lng: 76.5697 } },
+        { name: 'Guruvayur Temple', distance: 29, type: 'temple', coordinates: { lat: 10.5946, lng: 76.0407 } }
+      ]],
+      ['Palakkad', [
+        { name: 'Silent Valley National Park', distance: 70, type: 'park', coordinates: { lat: 11.0833, lng: 76.4333 } },
+        { name: 'Malampuzha Dam', distance: 12, type: 'dam', coordinates: { lat: 10.8333, lng: 76.6833 } }
+      ]],
+      ['Malappuram', [
+        { name: 'Nilambur Teak Museum', distance: 45, type: 'museum', coordinates: { lat: 11.2833, lng: 76.2333 } }
+      ]],
+      ['Kozhikode', [
+        { name: 'Kappad Beach', distance: 16, type: 'beach', coordinates: { lat: 11.3833, lng: 75.7167 } }
+      ]],
+      ['Wayanad', [
+        { name: 'Edakkal Caves', distance: 25, type: 'heritage', coordinates: { lat: 11.6167, lng: 76.2167 } },
+        { name: 'Banasura Sagar Dam', distance: 21, type: 'dam', coordinates: { lat: 11.6700, lng: 76.0400 } }
+      ]],
+      ['Kannur', [
+        { name: 'Muzhappilangad Beach', distance: 15, type: 'beach', coordinates: { lat: 11.8167, lng: 75.3667 } },
+        { name: 'St. Angelo Fort', distance: 3, type: 'fort', coordinates: { lat: 11.8667, lng: 75.3500 } }
+      ]],
+      ['Kasaragod', [
+        { name: 'Bekal Fort', distance: 16, type: 'fort', coordinates: { lat: 12.3917, lng: 75.0333 } }
       ]]
     ])
   },
   {
     state: 'Andhra Pradesh',
-    cities: ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Kadapa', 'Kurnool', 'Nellore'],
+    cities: ['Tirupati', 'Visakhapatnam', 'Kurnool', 'Anantapur', 'YSR Kadapa', 'NTR (Vijayawada)', 'Alluri Sitharama Raju', 'Nellore', 'Guntur'],
     touristSpots: new Map([
       ['Tirupati', [
-        { name: 'Tirumala Temple', distance: 22, type: 'temple', coordinates: { lat: 13.6288, lng: 79.4192 } },
-        { name: 'Kapila Theertham', distance: 4, type: 'waterfall', coordinates: { lat: 13.6550, lng: 79.4200 } },
-        { name: 'Chandragiri Fort', distance: 15, type: 'fort', coordinates: { lat: 13.5888, lng: 79.3192 } }
+        { name: 'Tirumala Venkateswara Temple', distance: 22, type: 'temple', coordinates: { lat: 13.6833, lng: 79.3472 } },
+        { name: 'Srikalahasteeswara Temple', distance: 36, type: 'temple', coordinates: { lat: 13.7500, lng: 79.6981 } },
+        { name: 'Talakona Waterfalls', distance: 49, type: 'waterfall', coordinates: { lat: 13.6667, lng: 79.1167 } },
+        { name: 'Nagalapuram', distance: 60, type: 'nature', coordinates: { lat: 13.5333, lng: 79.9000 } }
       ]],
       ['Visakhapatnam', [
         { name: 'RK Beach', distance: 3, type: 'beach', coordinates: { lat: 17.7160, lng: 83.3290 } },
-        { name: 'Kailasagiri', distance: 10, type: 'park', coordinates: { lat: 17.7500, lng: 83.3400 } },
-        { name: 'Submarine Museum', distance: 4, type: 'museum', coordinates: { lat: 17.7170, lng: 83.3300 } }
+        { name: 'Araku Valley', distance: 114, type: 'hill_station', coordinates: { lat: 18.3273, lng: 82.8756 } },
+        { name: 'Borra Caves', distance: 92, type: 'attraction', coordinates: { lat: 18.2833, lng: 83.0333 } },
+        { name: 'INS Kursura Submarine Museum', distance: 4, type: 'museum', coordinates: { lat: 17.7170, lng: 83.3300 } }
+      ]],
+      ['Kurnool', [
+        { name: 'Srisailam (Mallikarjuna Swamy Temple)', distance: 178, type: 'temple', coordinates: { lat: 15.8513, lng: 78.8686 } },
+        { name: 'Mantralayam', distance: 74, type: 'temple', coordinates: { lat: 15.9833, lng: 77.3833 } },
+        { name: 'Belum Caves', distance: 106, type: 'attraction', coordinates: { lat: 15.1004, lng: 78.1067 } },
+        { name: 'Yaganti (Sri Yagantiswamy Temple)', distance: 100, type: 'temple', coordinates: { lat: 15.5333, lng: 78.1333 } }
+      ]],
+      ['Anantapur', [
+        { name: 'Lepakshi (Veerabhadra Temple)', distance: 105, type: 'temple', coordinates: { lat: 13.8044, lng: 77.6067 } },
+        { name: 'Puttaparthi (Sathya Sai Baba Ashram)', distance: 83, type: 'spiritual', coordinates: { lat: 14.1653, lng: 77.8117 } }
+      ]],
+      ['YSR Kadapa', [
+        { name: 'Gandikota (Grand Canyon of India)', distance: 77, type: 'fort', coordinates: { lat: 15.1753, lng: 78.2872 } },
+        { name: 'Ameen Peer Dargah', distance: 5, type: 'temple', coordinates: { lat: 14.4674, lng: 78.8241 } }
+      ]],
+      ['NTR (Vijayawada)', [
+        { name: 'Kanaka Durga Temple', distance: 4, type: 'temple', coordinates: { lat: 16.5175, lng: 80.6097 } },
+        { name: 'Bhavani Island', distance: 6, type: 'nature', coordinates: { lat: 16.5200, lng: 80.5900 } },
+        { name: 'Undavalli Caves', distance: 8, type: 'heritage', coordinates: { lat: 16.4833, lng: 80.5833 } }
+      ]],
+      ['Alluri Sitharama Raju', [
+        { name: 'Lambasingi (Kashmir of Andhra Pradesh)', distance: 100, type: 'hill_station', coordinates: { lat: 17.9333, lng: 82.5500 } },
+        { name: 'Maredumilli', distance: 95, type: 'nature', coordinates: { lat: 17.5833, lng: 81.7333 } }
+      ]],
+      ['Nellore', [
+        { name: 'Mypad Beach', distance: 25, type: 'beach', coordinates: { lat: 14.3500, lng: 80.1500 } },
+        { name: 'Pulicat Bird Sanctuary', distance: 60, type: 'nature', coordinates: { lat: 13.4167, lng: 80.3167 } },
+        { name: 'Udayagiri Fort', distance: 80, type: 'fort', coordinates: { lat: 14.0167, lng: 79.3167 } }
       ]]
     ])
   }
@@ -171,7 +240,9 @@ const seedData = [
 
 async function seedDatabase() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/car-rental-app');
+    require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/car-rental-app';
+    await mongoose.connect(uri);
     await Location.deleteMany({});
     await Location.insertMany(seedData);
     console.log('✅ Database seeded successfully!');
@@ -186,4 +257,4 @@ if (require.main === module) {
   seedDatabase();
 }
 
-module.exports = { Location, seedDatabase, seedData };
+module.exports = { Location, seedDatabase, seedData };a

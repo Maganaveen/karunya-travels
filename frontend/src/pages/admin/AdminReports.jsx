@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminAPI } from '../../services/api';
-import toast from 'react-hot-toast';
-
+import { toast } from 'react-toastify';
+a
 const AdminReports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);

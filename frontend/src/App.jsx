@@ -28,6 +28,7 @@ import Rentals from './pages/Rentals';
 import Conditions from './pages/Conditions';
 import AboutUs from './pages/AboutUs';
 import AvailableCarsPublic from './pages/AvailableCarsPublic';
+import Profile from './pages/Profile';
 
 // Driver Pages
 import DriverDashboard from './pages/driver/DriverDashboard';
@@ -54,6 +55,16 @@ const AppRoutes = () => {
       <Route path="/rentals" element={<Rentals />} />
       <Route path="/conditions" element={<Conditions />} />
       <Route path="/about-us" element={<AboutUs />} />
+
+      {/* Profile Route (all authenticated roles) */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute allowedRoles={['customer', 'driver', 'admin']}>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
             {/* Customer Routes */}
             <Route

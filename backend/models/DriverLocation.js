@@ -9,13 +9,17 @@ const driverLocationSchema = new mongoose.Schema({
   },
   latitude: {
     type: Number,
-    required: true
+    default: 0
   },
   longitude: {
     type: Number,
-    required: true
+    default: 0
   },
   address: {
+    type: String,
+    default: ''
+  },
+  offlineReason: {
     type: String,
     default: ''
   },

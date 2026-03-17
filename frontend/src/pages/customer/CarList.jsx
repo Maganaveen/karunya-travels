@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { carsAPI } from '../../services/api';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import carPlaceholder from '../../assets/car-placeholder.jpg';
 
 const CarList = () => {
@@ -18,7 +18,7 @@ const CarList = () => {
       const response = await carsAPI.getAll();
       setCars(response.data);
     } catch (error) {
-      toast.error('Failed to fetch cars');
+      toast.error(error.response?.data?.message || error.message || 'Failed to fetch cars');
     } finally {
       setLoading(false);
     }
@@ -60,6 +60,7 @@ const CarList = () => {
                     style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
                     onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
                     onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                    onError={(e) => { e.target.onerror = null; e.target.src = carPlaceholder; }}
                   />
                   <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(0,0,0,0.6)', padding: '5px 10px', borderRadius: '20px', backdropFilter: 'blur(5px)' }}>
                     <span style={{ color: 'white', fontSize: '0.8rem' }}><i className="fas fa-star" style={{ color: 'var(--warning)' }}></i> 4.9</span>

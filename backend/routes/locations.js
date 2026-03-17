@@ -134,6 +134,7 @@ router.post('/calculate-journey', async (req, res) => {
 
     // Predefined coordinates for Tamil Nadu locations (you can expand this)
     const locationCoords = {
+      // Tamil Nadu
       'Cuddalore': [11.7480, 79.7714],
       'Chennai': [13.0827, 80.2707],
       'Madurai': [9.9252, 78.1198],
@@ -151,7 +152,34 @@ router.post('/calculate-journey', async (req, res) => {
       'Rameswaram': [9.2876, 79.3129],
       'Kanyakumari': [8.0883, 77.5385],
       'Ooty': [11.4102, 76.6950],
-      'Kodaikanal': [10.2381, 77.4892]
+      'Kodaikanal': [10.2381, 77.4892],
+      // Andhra Pradesh
+      'Tirupati': [13.6288, 79.4192],
+      'Visakhapatnam': [17.6868, 83.2185],
+      'Kurnool': [15.8281, 78.0373],
+      'Anantapur': [14.6819, 77.6006],
+      'YSR Kadapa': [14.4674, 78.8241],
+      'NTR (Vijayawada)': [16.5062, 80.6480],
+      'Alluri Sitharama Raju': [17.5833, 81.7333],
+      'Nellore': [14.4426, 79.9865],
+      'Guntur': [16.3067, 80.4365],
+      // Kerala
+      'Thiruvananthapuram': [8.5241, 76.9366],
+      'Kollam': [8.8932, 76.6141],
+      'Alappuzha': [9.4981, 76.3388],
+      'Pathanamthitta': [9.2648, 76.7870],
+      'Kottayam': [9.5916, 76.5222],
+      'Idukki': [9.8494, 76.9710],
+      'Ernakulam': [9.9816, 76.2999],
+      'Thrissur': [10.5276, 76.2144],
+      'Palakkad': [10.7867, 76.6548],
+      'Malappuram': [11.0510, 76.0711],
+      'Kozhikode': [11.2588, 75.7804],
+      'Wayanad': [11.6854, 76.1320],
+      'Kannur': [11.8745, 75.3704],
+      'Kasaragod': [12.4996, 74.9869],
+      'Kochi': [9.9312, 76.2673],
+      'Munnar': [10.0889, 77.0595]
     };
 
     // Build complete route including tourist spots
@@ -259,7 +287,7 @@ function calculateHaversineDistance([lat1, lon1], [lat2, lon2]) {
   return R * c;
 }
 
-// Get Tamil Nadu specific data
+// Get Tamil Nadu specific data (kept for backward compatibility)
 router.get('/tamilnadu-data', async (req, res) => {
   try {
     const tamilNadu = await Location.findOne({ state: 'Tamil Nadu' });
@@ -268,7 +296,6 @@ router.get('/tamilnadu-data', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Tamil Nadu data not found' });
     }
 
-    // Convert Map to object for frontend
     const touristSpotsObj = {};
     if (tamilNadu.touristSpots) {
       tamilNadu.touristSpots.forEach((spots, district) => {
@@ -286,6 +313,36 @@ router.get('/tamilnadu-data', async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching TN data:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get all tourist spots for a state (generic endpoint)
+router.get('/state-data/:state', async (req, res) => {
+  try {
+    const location = await Location.findOne({ state: req.params.state });
+
+    if (!location) {
+      return res.status(404).json({ success: false, message: 'State data not found' });
+    }
+
+    const touristSpotsObj = {};
+    if (location.touristSpots) {
+      location.touristSpots.forEach((spots, district) => {
+        touristSpotsObj[district] = spots;
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        districts: location.cities,
+        touristSpots: touristSpotsObj
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching state data:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

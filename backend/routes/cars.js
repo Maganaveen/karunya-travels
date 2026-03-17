@@ -9,6 +9,7 @@ const {
   getAvailableCars
 } = require('../controllers/carController');
 const { auth, authorize } = require('../middleware/auth');
+const parseCarForm = require('../middleware/upload');
 
 const router = express.Router();
 
@@ -19,8 +20,8 @@ router.get('/:id', getCarById);
 
 // Admin routes
 router.get('/admin/all', auth, authorize('admin'), getAllCarsAdmin);
-router.post('/', auth, authorize('admin'), createCar);
-router.put('/:id', auth, authorize('admin'), updateCar);
+router.post('/', auth, authorize('admin'), parseCarForm, createCar);
+router.put('/:id', auth, authorize('admin'), parseCarForm, updateCar);
 router.delete('/:id', auth, authorize('admin'), deleteCar);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://karunya-travels-2.onrender.com/api';
 
 // Create axios instance
 const api = axios.create({
@@ -29,6 +29,9 @@ export const locationAPI = {
   
   // Get Tamil Nadu data (districts and tourist spots)
   getTamilNaduData: () => api.get('/locations/tamilnadu-data'),
+  
+  // Get state data (districts and tourist spots) for any state
+  getStateData: (state) => api.get(`/locations/state-data/${state}`),
   
   // Get tourist spots by city
   getTouristSpots: (state, city) => api.get(`/locations/tourist-spots/${state}/${city}`),

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { carsAPI, bookingsAPI } from '../../services/api';
 import { locationAPI } from '../../services/locationAPI';
 import { useAuth } from '../../context/AuthContext';
@@ -22,6 +22,8 @@ const StartJourney = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tnDistricts, setTnDistricts] = useState([]);
   const [tnTouristSpotsData, setTnTouristSpotsData] = useState({});
+  const [stateToursitSpotsData, setStateTouristSpotsData] = useState({});
+  const [loadingSpots, setLoadingSpots] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [advanceAmount, setAdvanceAmount] = useState('');
@@ -35,11 +37,17 @@ const StartJourney = () => {
   const [cities, setCities] = useState([]);
   const [touristSpots, setTouristSpots] = useState({});
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
 
   const watchPickupState = watch('state');
   const watchHomeCity = watch('homeCity');
+  const watchJourneyDate = watch('journeyDate');
+  const watchReturnDate = watch('returnDate');
   const selectedStateValue = watchPickupState || selectedState;
+
+  const calculatedDays = watchJourneyDate && watchReturnDate
+    ? Math.max(1, Math.ceil((new Date(watchReturnDate) - new Date(watchJourneyDate)) / (1000 * 60 * 60 * 24)))
+    : null;
 
   // Fetch states on component mount
   useEffect(() => {
@@ -56,6 +64,25 @@ const StartJourney = () => {
       }
     } catch (error) {
       console.error('Failed to fetch Tamil Nadu data:', error);
+    }
+  };
+
+  // Fetch state tourist spots data when state changes
+  useEffect(() => {
+    if (selectedStateValue) {
+      fetchStateData(selectedStateValue);
+    }
+  }, [selectedStateValue]);
+
+  const fetchStateData = async (state) => {
+    try {
+      const response = await locationAPI.getStateData(state);
+      if (response.data.success) {
+        setStateTouristSpotsData(response.data.data.touristSpots || {});
+      }
+    } catch (error) {
+      console.error('Failed to fetch state data:', error);
+      setStateTouristSpotsData({});
     }
   };
 
@@ -93,22 +120,91 @@ const StartJourney = () => {
     }
   };
 
+  const OVERPASS_ENDPOINTS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
+  ];
+
+  const fetchOverpassSpots = async (cityName) => {
+    const query = `[out:json][timeout:15];
+area[name="${cityName}"]->.searchArea;
+(
+  node["tourism"="attraction"](area.searchArea);
+  node["tourism"="museum"](area.searchArea);
+  node["leisure"="park"](area.searchArea);
+  node["amenity"="place_of_worship"](area.searchArea);
+);
+out body 50;`;
+
+    for (const endpoint of OVERPASS_ENDPOINTS) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          body: `data=${encodeURIComponent(query)}`,
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const spots = (data.elements || [])
+          .filter(el => el.tags?.name)
+          .map(el => ({
+            name: el.tags.name,
+            type: el.tags.tourism || el.tags.leisure || el.tags.amenity || 'attraction',
+            lat: el.lat || el.center?.lat,
+            lon: el.lon || el.center?.lon
+          }))
+          .filter((spot, i, arr) => arr.findIndex(s => s.name === spot.name) === i);
+        if (spots.length > 0) return spots;
+      } catch (err) {
+        console.warn(`Overpass endpoint ${endpoint} failed for ${cityName}:`, err.message);
+      }
+    }
+    return [];
+  };
+
   const fetchTouristSpotsForCities = async () => {
+    setLoadingSpots(true);
     try {
       const spots = {};
       for (const city of placesToVisit) {
-        if (selectedStateValue === 'Tamil Nadu' && tnTouristSpotsData[city]) {
-          spots[city] = tnTouristSpotsData[city];
-          console.log(`Madurai spots from tnTouristSpotsData:`, tnTouristSpotsData['Madurai']);
-        } else {
-          const response = await locationAPI.getTouristSpots(selectedStateValue, city);
-          spots[city] = response.data.data;
+        // 1. Start with seeded DB data from API
+        let dbSpots = stateToursitSpotsData[city] || [];
+        
+        // 2. Try Overpass for additional spots
+        let overpassSpots = [];
+        try {
+          overpassSpots = await fetchOverpassSpots(city);
+        } catch {
+          // Overpass failed, that's fine
+        }
+
+        // 3. Merge: DB spots first, then unique Overpass spots
+        const dbNames = new Set(dbSpots.map(s => s.name.toLowerCase()));
+        const uniqueOverpass = overpassSpots.filter(s => !dbNames.has(s.name.toLowerCase()));
+        spots[city] = [...dbSpots, ...uniqueOverpass];
+
+        // 4. If still empty, try the per-city API endpoint
+        if (spots[city].length === 0) {
+          try {
+            const response = await locationAPI.getTouristSpots(selectedStateValue, city);
+            if (response.data.data && response.data.data.length > 0) {
+              spots[city] = response.data.data;
+            }
+          } catch {
+            // No spots available for this city
+          }
         }
       }
-      console.log('All tourist spots fetched:', spots);
       setTouristSpots(spots);
     } catch (error) {
       toast.error('Failed to fetch tourist spots');
+    } finally {
+      setLoadingSpots(false);
     }
   };
 
@@ -134,7 +230,7 @@ const StartJourney = () => {
       );
 
       const { totalDistance: distance, totalTime: time, segments } = response.data.data;
-      const days = parseInt(data.days);
+      const days = Math.max(1, Math.ceil((new Date(data.returnDate) - new Date(data.journeyDate)) / (1000 * 60 * 60 * 24)));
       
       console.log('Journey calculation response:', response.data);
       console.log('Segments received:', segments);
@@ -276,10 +372,10 @@ const StartJourney = () => {
     journeyDetails.placesToVisit.forEach(city => {
       if (journeyDetails.selectedTouristSpots[city] && journeyDetails.selectedTouristSpots[city].length > 0) {
         journeyDetails.selectedTouristSpots[city].forEach(spot => {
-          waypoints.push(encodeURIComponent(`${spot.name}, ${city}, Tamil Nadu, India`));
+          waypoints.push(encodeURIComponent(`${spot.name}, ${city}, ${journeyDetails.state}, India`));
         });
       } else {
-        waypoints.push(encodeURIComponent(`${city}, Tamil Nadu, India`));
+        waypoints.push(encodeURIComponent(`${city}, ${journeyDetails.state}, India`));
       }
     });
     
@@ -431,12 +527,15 @@ TERMS & CONDITIONS
                     <div className="input-icon-wrapper"><i className="fas fa-flag"></i></div>
                     <select
                       className="input-styled"
-                      {...register('state', { required: 'State is required' })}
-                      onChange={(e) => {
-                        setSelectedState(e.target.value);
-                        setPlacesToVisit([]);
-                        setSelectedTouristSpots({});
-                      }}
+                      {...register('state', {
+                        required: 'State is required',
+                        onChange: (e) => {
+                          setSelectedState(e.target.value);
+                          setValue('homeCity', '');
+                          setPlacesToVisit([]);
+                          setSelectedTouristSpots({});
+                        }
+                      })}
                     >
                       <option value="">Select State...</option>
                       {states.map(state => (
@@ -457,7 +556,7 @@ TERMS & CONDITIONS
                       disabled={!selectedStateValue}
                     >
                       <option value="">Select District...</option>
-                      {tnDistricts.map(district => (
+                      {cities.map(district => (
                         <option key={district} value={district}>{district}</option>
                       ))}
                     </select>
@@ -511,7 +610,7 @@ TERMS & CONDITIONS
                       {dropdownOpen && (
                         <div className="dropdown-menu-styled">
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.5rem' }}>
-                            {(selectedStateValue === 'Tamil Nadu' ? tnDistricts : cities).map(city => (
+                            {cities.map(city => (
                               <label key={city} className="checkbox-label" style={{ fontSize: '0.9rem' }}>
                                 <input
                                   type="checkbox"
@@ -552,10 +651,11 @@ TERMS & CONDITIONS
                     )}
                   </div>
 
-                  {placesToVisit.length > 0 && Object.keys(touristSpots).length > 0 && (
+                  {placesToVisit.length > 0 && (loadingSpots || Object.keys(touristSpots).length > 0) && (
                     <div className="tourist-spots-block">
                       <h4 className="section-title" style={{ fontSize: '1.25rem', marginBottom: '1.5rem', marginTop: '2rem' }}>
                         <i className="fas fa-camera" style={{ background: 'none', padding: 0, color: '#2563eb' }}></i> Select Tourist Spots
+                        {loadingSpots && <span style={{ fontSize: '0.85rem', color: '#64748b', marginLeft: '0.75rem' }}><i className="fas fa-spinner fa-spin"></i> Fetching spots...</span>}
                       </h4>
 
                       {placesToVisit.map(city => (
@@ -595,6 +695,7 @@ TERMS & CONDITIONS
                                     />
                                     <div>
                                       <div style={{ fontWeight: '600', color: '#334155' }}>{spot.name}</div>
+                                      {spot.type && <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.15rem', textTransform: 'capitalize' }}><i className="fas fa-tag" style={{ marginRight: '0.25rem', fontSize: '0.65rem' }}></i>{spot.type}</div>}
                                       {spot.distance && <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '0.2rem' }}>{spot.distance} km away</div>}
                                     </div>
                                   </div>
@@ -627,17 +728,39 @@ TERMS & CONDITIONS
                 </div>
 
                 <div className="form-group-styled">
-                  <label>Duration (Days)</label>
+                  <label>Pick-up Time</label>
                   <div className="input-wrapper">
                     <div className="input-icon-wrapper"><i className="fas fa-clock"></i></div>
-                    <select className="input-styled" {...register('days', { required: 'Number of days is required' })}>
-                      <option value="">Select Duration...</option>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(day => (
-                        <option key={day} value={day}>{day} {day === 1 ? 'Day' : 'Days'}</option>
-                      ))}
-                    </select>
+                    <input
+                      type="time"
+                      className="input-styled"
+                      {...register('pickupTime', { required: 'Pick-up time is required' })}
+                    />
                   </div>
-                  {errors.days && <span className="error-text">{errors.days.message}</span>}
+                  {errors.pickupTime && <span className="error-text">{errors.pickupTime.message}</span>}
+                </div>
+
+                <div className="form-group-styled">
+                  <label>Return Date</label>
+                  <div className="input-wrapper">
+                    <div className="input-icon-wrapper"><i className="fas fa-calendar-check"></i></div>
+                    <input
+                      type="date"
+                      className="input-styled"
+                      {...register('returnDate', {
+                        required: 'Return date is required',
+                        validate: value => !watchJourneyDate || new Date(value) >= new Date(watchJourneyDate) || 'Return date must be on or after journey date'
+                      })}
+                      min={watchJourneyDate || new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                  {errors.returnDate && <span className="error-text">{errors.returnDate.message}</span>}
+                  {calculatedDays && (
+                    <span style={{ fontSize: '0.85rem', color: '#2563eb', marginTop: '0.35rem', display: 'block' }}>
+                      <i className="fas fa-clock" style={{ marginRight: '0.25rem' }}></i>
+                      Duration: {calculatedDays} {calculatedDays === 1 ? 'Day' : 'Days'}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -804,7 +927,7 @@ TERMS & CONDITIONS
                   loading="lazy"
                   allowFullScreen
                   referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&origin=${encodeURIComponent(journeyDetails.homeCity + ', Tamil Nadu, India')}&destination=${encodeURIComponent((journeyDetails.returnToStart ? journeyDetails.homeCity : journeyDetails.placesToVisit[journeyDetails.placesToVisit.length - 1]) + ', Tamil Nadu, India')}&waypoints=${buildMapWaypoints()}&mode=driving`}>
+                  src={`https://www.google.com/maps/embed/v1/directions?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&origin=${encodeURIComponent(journeyDetails.homeCity + ', ' + journeyDetails.state + ', India')}&destination=${encodeURIComponent((journeyDetails.returnToStart ? journeyDetails.homeCity : journeyDetails.placesToVisit[journeyDetails.placesToVisit.length - 1]) + ', ' + journeyDetails.state + ', India')}&waypoints=${buildMapWaypoints()}&mode=driving`}>
                 </iframe>
               </div>
             </div>

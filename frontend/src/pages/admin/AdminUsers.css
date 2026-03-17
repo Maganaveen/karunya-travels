@@ -1,0 +1,463 @@
+/* ═══════════════════════════════════════════════════
+   Admin Users — Redesign
+   ═══════════════════════════════════════════════════ */
+
+.au-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+/* ── Header ── */
+.au-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.au-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.au-header h1 i {
+  color: #3b82f6;
+}
+
+.au-header p {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+
+/* ── Stat Cards ── */
+.au-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.au-stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s, box-shadow 0.25s;
+  border: 1px solid #f0f0f0;
+}
+
+.au-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.au-stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.au-stat-icon.blue   { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.au-stat-icon.green  { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.au-stat-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.au-stat-icon.orange { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+.au-stat-info h4 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.15rem;
+  line-height: 1;
+}
+
+.au-stat-info span {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── Main Card ── */
+.au-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+/* ── Toolbar ── */
+.au-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+}
+
+.au-search {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+
+.au-search i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.au-search input {
+  width: 100%;
+  padding: 0.7rem 1rem 0.7rem 2.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background: #f8fafc;
+  transition: all 0.2s;
+}
+
+.au-search input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.au-search input::placeholder {
+  color: #94a3b8;
+}
+
+.au-role-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 10px;
+}
+
+.au-role-tab {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.au-role-tab.active {
+  background: #fff;
+  color: #3b82f6;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.au-role-tab:hover:not(.active) {
+  color: #1e293b;
+}
+
+.au-role-count {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.au-role-tab.active .au-role-count {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ── User List ── */
+.au-user-list {
+  padding: 0;
+}
+
+.au-user-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f8fafc;
+  transition: background 0.15s;
+}
+
+.au-user-row:last-child {
+  border-bottom: none;
+}
+
+.au-user-row:hover {
+  background: #f8fafc;
+}
+
+.au-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.au-user-avatar.admin    { background: linear-gradient(135deg, #10b981, #059669); }
+.au-user-avatar.driver   { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.au-user-avatar.customer { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+.au-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.au-user-name {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.au-user-contact {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.au-user-contact span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ── Badges ── */
+.au-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.au-role-badge.admin    { background: #d1fae5; color: #047857; }
+.au-role-badge.driver   { background: #ede9fe; color: #6d28d9; }
+.au-role-badge.customer { background: #dbeafe; color: #1d4ed8; }
+
+.au-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.au-status-badge.active   { background: #d1fae5; color: #047857; }
+.au-status-badge.inactive { background: #fef3c7; color: #b45309; }
+
+.au-avail-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.au-avail-badge.online  { background: #d1fae5; color: #047857; }
+.au-avail-badge.offline { background: #fee2e2; color: #b91c1c; }
+
+/* ── User Meta (right side) ── */
+.au-user-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.au-user-tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.au-user-date {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.au-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.au-action-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.au-action-btn.danger:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+/* ── Footer ── */
+.au-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.au-footer-text {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* ── Empty State ── */
+.au-empty {
+  text-align: center;
+  padding: 4rem 1.5rem;
+  color: #94a3b8;
+}
+
+.au-empty i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+}
+
+.au-empty p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ── Loading ── */
+.au-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.au-loading i {
+  font-size: 2rem;
+  color: #3b82f6;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .au-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .au-role-tabs {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .au-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .au-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .au-user-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .au-user-meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .au-user-contact {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .au-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .au-page {
+    padding: 0 1rem 2rem;
+  }
+
+  .au-role-tabs {
+    flex-wrap: wrap;
+  }
+}

@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { driversAPI } from '../../services/api';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
+import './DriverLocation.css';
 
 const DriverLocation = () => {
-  const [location, setLocation] = useState({
-    latitude: 0,
-    longitude: 0,
-    address: ''
-  });
+  const [location, setLocation] = useState({ latitude: 0, longitude: 0, address: '' });
   const [isAvailable, setIsAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [geoloading, setGeoLoading] = useState(false);
+  const [showOfflineForm, setShowOfflineForm] = useState(false);
+  const [offlineReason, setOfflineReason] = useState('');
 
-  useEffect(() => {
-    fetchCurrentLocation();
-  }, []);
+  useEffect(() => { fetchCurrentLocation(); }, []);
 
   const fetchCurrentLocation = async () => {
     try {
@@ -35,12 +32,7 @@ const DriverLocation = () => {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation((prev) => ({
-            ...prev,
-            latitude,
-            longitude
-          }));
-
+          setLocation((prev) => ({ ...prev, latitude, longitude }));
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -51,18 +43,12 @@ const DriverLocation = () => {
               address: data.address?.road || data.address?.suburb || data.address?.city || 'Location Updated'
             }));
           } catch (error) {
-            setLocation((prev) => ({
-              ...prev,
-              address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
-            }));
+            setLocation((prev) => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
           } finally {
             setGeoLoading(false);
           }
         },
-        (error) => {
-          toast.error('Failed to get location: ' + error.message);
-          setGeoLoading(false);
-        }
+        (error) => { toast.error('Failed to get location: ' + error.message); setGeoLoading(false); }
       );
     } else {
       toast.error('Geolocation is not supported by this browser');
@@ -71,25 +57,14 @@ const DriverLocation = () => {
   };
 
   const handleAddressChange = (e) => {
-    setLocation((prev) => ({
-      ...prev,
-      address: e.target.value
-    }));
+    setLocation((prev) => ({ ...prev, address: e.target.value }));
   };
 
   const updateLocation = async () => {
-    if (!location.latitude || !location.longitude) {
-      toast.error('Please select a location first');
-      return;
-    }
-
+    if (!location.latitude || !location.longitude) { toast.error('Please select a location first'); return; }
     setSaving(true);
     try {
-      await driversAPI.updateLocation({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        address: location.address
-      });
+      await driversAPI.updateLocation({ latitude: location.latitude, longitude: location.longitude, address: location.address });
       toast.success('Location updated successfully');
     } catch (error) {
       toast.error('Failed to update location');
@@ -98,177 +73,194 @@ const DriverLocation = () => {
     }
   };
 
+  const handleGoOfflineClick = () => { setShowOfflineForm(true); };
+
+  const confirmGoOffline = async () => {
+    if (!offlineReason.trim()) { toast.error('Please provide a reason for going offline'); return; }
+    try {
+      await driversAPI.updateAvailability(false, offlineReason.trim());
+      setIsAvailable(false);
+      setShowOfflineForm(false);
+      setOfflineReason('');
+      toast.success('You are now OFFLINE');
+    } catch (error) {
+      toast.error('Failed to update availability');
+    }
+  };
+
   const updateAvailability = async (newStatus) => {
     try {
       await driversAPI.updateAvailability(newStatus);
       setIsAvailable(newStatus);
+      setShowOfflineForm(false);
+      setOfflineReason('');
       toast.success(`You are now ${newStatus ? 'ONLINE' : 'OFFLINE'}`);
     } catch (error) {
       toast.error('Failed to update availability');
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="dl-loading">
+        <i className="fas fa-spinner fa-spin"></i>
+        <span>Loading location data…</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="container">
-      <h2>My Location & Availability</h2>
+    <div className="dl-page">
+      {/* ── Banner ── */}
+      <div className="dl-banner">
+        <h1><i className="fas fa-map-marker-alt"></i> My Location & Availability</h1>
+        <p>Keep your location updated and stay online to receive more orders.</p>
+      </div>
 
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div className="card" style={{ marginBottom: '30px' }}>
+      {/* ── Availability Section ── */}
+      <div className="dl-section">
+        <div className="dl-section-header">
+          <i className="fas fa-signal"></i>
           <h3>Availability Status</h3>
-          <div style={{
-            padding: '20px',
-            backgroundColor: isAvailable ? '#e8f5e9' : '#ffebee',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ margin: '0', color: isAvailable ? '#28a745' : '#dc3545' }}>
-              {isAvailable ? '🟢 ONLINE' : '🔴 OFFLINE'}
-            </h2>
-            <p style={{ margin: '10px 0 0 0', color: '#666' }}>
-              {isAvailable ? 'You will receive new orders' : 'You will not receive new orders'}
-            </p>
+        </div>
+        <div className="dl-section-body">
+          <div className={`dl-status-strip ${isAvailable ? 'online' : 'offline'}`}>
+            <span className="dl-status-dot"></span>
+            <span className="dl-status-label">{isAvailable ? 'ONLINE' : 'OFFLINE'}</span>
           </div>
+          <p className="dl-status-hint">
+            {isAvailable ? 'You will receive new orders' : 'You will not receive new orders'}
+          </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div className="dl-toggle-group">
             <button
               onClick={() => updateAvailability(true)}
-              className={`btn ${isAvailable ? 'btn-success' : 'btn-secondary'}`}
-              style={{ width: '100%' }}
+              className={`dl-toggle-btn go-online ${isAvailable ? 'active' : ''}`}
             >
-              Go Online
+              <i className="fas fa-toggle-on"></i> Go Online
             </button>
             <button
-              onClick={() => updateAvailability(false)}
-              className={`btn ${!isAvailable ? 'btn-danger' : 'btn-secondary'}`}
-              style={{ width: '100%' }}
+              onClick={handleGoOfflineClick}
+              className={`dl-toggle-btn go-offline ${!isAvailable ? 'active' : ''}`}
             >
-              Go Offline
+              <i className="fas fa-toggle-off"></i> Go Offline
             </button>
           </div>
+
+          {showOfflineForm && (
+            <div className="dl-offline-form">
+              <label>
+                <i className="fas fa-exclamation-circle"></i> Reason for going offline *
+              </label>
+              <select value={offlineReason} onChange={(e) => setOfflineReason(e.target.value)}>
+                <option value="">Select a reason...</option>
+                <option value="Personal work">Personal work</option>
+                <option value="Vehicle maintenance">Vehicle maintenance</option>
+                <option value="Health issue">Health issue</option>
+                <option value="Break / Rest">Break / Rest</option>
+                <option value="End of shift">End of shift</option>
+                <option value="Other">Other</option>
+              </select>
+              {offlineReason === 'Other' && (
+                <input
+                  type="text"
+                  placeholder="Please specify your reason..."
+                  onChange={(e) => setOfflineReason(e.target.value || 'Other')}
+                />
+              )}
+              <div className="dl-offline-actions">
+                <button onClick={confirmGoOffline} className="dl-confirm-btn">
+                  <i className="fas fa-power-off"></i> Confirm Go Offline
+                </button>
+                <button onClick={() => { setShowOfflineForm(false); setOfflineReason(''); }} className="dl-cancel-btn">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
 
-        <div className="card">
+      {/* ── Update Location Section ── */}
+      <div className="dl-section">
+        <div className="dl-section-header">
+          <i className="fas fa-crosshairs"></i>
           <h3>Update Your Location</h3>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-              Latitude
-            </label>
-            <input
-              type="number"
-              value={location.latitude}
-              readOnly
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                backgroundColor: '#f5f5f5'
-              }}
-              placeholder="Latitude"
-            />
-            <p style={{ margin: '5px 0 0 0', fontSize: '0.85rem', color: '#666' }}>
-              Auto-detected from GPS
-            </p>
+        </div>
+        <div className="dl-section-body">
+          <div className="dl-coord-grid">
+            <div className="dl-field">
+              <label>Latitude</label>
+              <input type="number" value={location.latitude} readOnly placeholder="Latitude" />
+              <div className="dl-hint">Auto-detected from GPS</div>
+            </div>
+            <div className="dl-field">
+              <label>Longitude</label>
+              <input type="number" value={location.longitude} readOnly placeholder="Longitude" />
+              <div className="dl-hint">Auto-detected from GPS</div>
+            </div>
           </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-              Longitude
-            </label>
-            <input
-              type="number"
-              value={location.longitude}
-              readOnly
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                backgroundColor: '#f5f5f5'
-              }}
-              placeholder="Longitude"
-            />
-            <p style={{ margin: '5px 0 0 0', fontSize: '0.85rem', color: '#666' }}>
-              Auto-detected from GPS
-            </p>
-          </div>
-
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: 'bold' }}>
-              Current Address
-            </label>
+          <div className="dl-field full">
+            <label>Current Address</label>
             <input
               type="text"
               value={location.address}
               onChange={handleAddressChange}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box'
-              }}
               placeholder="Enter your current location address"
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
-            <button
-              onClick={getCurrentPosition}
-              disabled={geoloading}
-              className="btn btn-secondary"
-              style={{ width: '100%' }}
-            >
-              {geoloading ? 'Getting Location...' : '📍 Get Current Location'}
+          <div className="dl-action-group">
+            <button onClick={getCurrentPosition} disabled={geoloading} className="dl-action-btn secondary">
+              <i className="fas fa-location-arrow"></i>
+              {geoloading ? 'Getting Location...' : 'Get Current Location'}
             </button>
-            <button
-              onClick={updateLocation}
-              disabled={saving}
-              className="btn btn-primary"
-              style={{ width: '100%' }}
-            >
-              {saving ? 'Saving...' : '✓ Save Location'}
+            <button onClick={updateLocation} disabled={saving} className="dl-action-btn primary">
+              <i className="fas fa-check"></i>
+              {saving ? 'Saving...' : 'Save Location'}
             </button>
           </div>
 
-          <div style={{
-            padding: '15px',
-            backgroundColor: '#f0f8ff',
-            borderRadius: '4px',
-            border: '1px solid #dce3f1'
-          }}>
-            <p style={{ margin: '0', fontSize: '0.9rem', color: '#333' }}>
-              <strong>ℹ️ Note:</strong> Your location helps us assign orders to drivers nearby. 
-              Keep your location updated and stay online to receive more orders.
-            </p>
+          <div className="dl-info-banner">
+            <i className="fas fa-info-circle"></i>
+            <p>Your location helps us assign orders to drivers nearby. Keep your location updated and stay online to receive more orders.</p>
           </div>
         </div>
+      </div>
 
-        {location.latitude && location.longitude && (
-          <div className="card" style={{ marginTop: '30px' }}>
-            <h3>Your Current Location</h3>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#f9f9f9',
-              borderRadius: '4px',
-              border: '1px solid #eee'
-            }}>
-              <p><strong>Latitude:</strong> {location.latitude.toFixed(6)}</p>
-              <p><strong>Longitude:</strong> {location.longitude.toFixed(6)}</p>
-              {location.address && <p><strong>Address:</strong> {location.address}</p>}
+      {/* ── Current Location Summary ── */}
+      {location.latitude !== 0 && location.longitude !== 0 && (
+        <div className="dl-section">
+          <div className="dl-section-header">
+            <i className="fas fa-map-pin"></i>
+            <h3>Current Location</h3>
+          </div>
+          <div className="dl-section-body">
+            <div className="dl-location-summary">
+              <div className="dl-loc-item">
+                <span>Latitude</span>
+                <strong>{location.latitude.toFixed(6)}</strong>
+              </div>
+              <div className="dl-loc-item">
+                <span>Longitude</span>
+                <strong>{location.longitude.toFixed(6)}</strong>
+              </div>
+              {location.address && (
+                <div className="dl-loc-item full">
+                  <span>Address</span>
+                  <strong>{location.address}</strong>
+                </div>
+              )}
               {location.lastUpdated && (
-                <p style={{ fontSize: '0.9rem', color: '#666', margin: '10px 0 0 0' }}>
-                  Last updated: {new Date(location.lastUpdated).toLocaleString()}
-                </p>
+                <div className="dl-loc-item full">
+                  <small>Last updated: {new Date(location.lastUpdated).toLocaleString()}</small>
+                </div>
               )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

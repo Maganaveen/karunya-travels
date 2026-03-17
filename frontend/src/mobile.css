@@ -1,24 +1,5 @@
 /* ===== MOBILE RESPONSIVE STYLES ===== */
 
-/* Mobile sidebar overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-overlay.active {
-  display: block;
-  opacity: 1;
-}
-
 /* ===== Tablet (max-width: 1024px) ===== */
 @media (max-width: 1024px) {
   .grid-4 {
@@ -40,56 +21,6 @@
 
 /* ===== Mobile (max-width: 768px) ===== */
 @media (max-width: 768px) {
-  /* --- Layout & Sidebar --- */
-  .sidebar {
-    transform: translateX(-100%);
-    width: 280px;
-  }
-
-  .sidebar.mobile-open {
-    transform: translateX(0);
-  }
-
-  .sidebar.collapsed {
-    width: 280px;
-    transform: translateX(-100%);
-  }
-
-  .sidebar.collapsed.mobile-open {
-    transform: translateX(0);
-  }
-
-  .sidebar.collapsed .logo-text,
-  .sidebar.collapsed .nav-link span,
-  .sidebar.collapsed .user-details {
-    display: block;
-  }
-
-  .main-content {
-    margin-left: 0 !important;
-  }
-
-  .sidebar.collapsed + .main-content {
-    margin-left: 0;
-  }
-
-  .content {
-    padding: 1rem;
-  }
-
-  .top-bar {
-    padding: 0.75rem 1rem;
-  }
-
-  .top-bar-right .user-profile {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .top-bar-right .user-profile .status-badge {
-    display: none;
-  }
-
   /* --- Typography --- */
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; margin-bottom: 1rem; }
@@ -498,8 +429,8 @@
   }
 
   /* --- User Profile in Top Bar --- */
-  .user-profile > div[style*="flexDirection: column"] span:first-child {
-    font-size: 0.85rem !important;
+  .breadcrumb-page {
+    font-size: 0.9rem;
   }
 }
 
@@ -621,3 +552,4 @@
     min-width: 500px;
   }
 }
+l

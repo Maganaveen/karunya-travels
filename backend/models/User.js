@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema({
   isAvailable: {
     type: Boolean,
     default: function() { return this.role === 'driver' ? false : undefined; }
+  },
+  avatar: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

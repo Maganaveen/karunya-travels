@@ -1,0 +1,171 @@
+/* ═══════════════════════════════════════════════════
+   Admin Cars — Redesign
+   ═══════════════════════════════════════════════════ */
+
+/* ── Car Cards Grid ── */
+.ad-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.ad-car-card {
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: all 0.25s;
+  position: relative;
+}
+
+.ad-car-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  border-color: #e2e8f0;
+}
+
+.ad-car-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ad-car-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+}
+
+.ad-car-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.ad-car-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ad-car-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.15rem;
+}
+
+.ad-car-number {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.ad-car-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* ── Car Details Row ── */
+.ad-car-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.ad-car-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.ad-car-detail i {
+  color: #94a3b8;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ad-car-detail .ad-price {
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+/* ── Car Actions ── */
+.ad-car-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.ad-car-actions .ad-action-btn {
+  flex: 1;
+  padding: 0.55rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.ad-car-actions .ad-action-btn.edit {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.ad-car-actions .ad-action-btn.edit:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.ad-car-actions .ad-action-btn.delete {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.ad-car-actions .ad-action-btn.delete:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .ad-cars-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .ad-cars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-car-details {
+    grid-template-columns: 1fr;
+  }
+}

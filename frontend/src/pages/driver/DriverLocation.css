@@ -1,0 +1,459 @@
+/* ═══════════════════════════════════════════════════
+   Driver Location — Redesign
+   ═══════════════════════════════════════════════════ */
+
+.dl-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+/* ── Header Banner ── */
+.dl-banner {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  color: #fff;
+  margin-bottom: 1.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dl-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -8%;
+  width: 260px;
+  height: 260px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dl-banner h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.3rem;
+}
+
+.dl-banner p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Availability Card ── */
+.dl-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.dl-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dl-section-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.dl-section-header i {
+  color: #0d9488;
+}
+
+.dl-section-body {
+  padding: 1.5rem;
+}
+
+/* ── Status Badge ── */
+.dl-status-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 14px;
+  margin-bottom: 1.25rem;
+  transition: background 0.3s;
+}
+
+.dl-status-strip.online {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+}
+
+.dl-status-strip.offline {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+}
+
+.dl-status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dl-status-strip.online .dl-status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+  animation: dl-pulse 2s infinite;
+}
+
+.dl-status-strip.offline .dl-status-dot {
+  background: #ef4444;
+}
+
+@keyframes dl-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(34, 197, 94, 0.4); }
+  50% { box-shadow: 0 0 14px rgba(34, 197, 94, 0.7); }
+}
+
+.dl-status-label {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.dl-status-strip.online .dl-status-label { color: #15803d; }
+.dl-status-strip.offline .dl-status-label { color: #dc2626; }
+
+.dl-status-hint {
+  font-size: 0.82rem;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Toggle Buttons ── */
+.dl-toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.dl-toggle-btn {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.dl-toggle-btn.go-online {
+  background: #f0fdf4;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+
+.dl-toggle-btn.go-online:hover,
+.dl-toggle-btn.go-online.active {
+  background: #22c55e;
+  color: #fff;
+  border-color: #22c55e;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+}
+
+.dl-toggle-btn.go-offline {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.dl-toggle-btn.go-offline:hover,
+.dl-toggle-btn.go-offline.active {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+/* ── Offline Reason Form ── */
+.dl-offline-form {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: #fffbeb;
+  border-radius: 14px;
+  border: 1px solid #fde68a;
+}
+
+.dl-offline-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #92400e;
+}
+
+.dl-offline-form select,
+.dl-offline-form input[type="text"] {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  background: #fff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.dl-offline-form select:focus,
+.dl-offline-form input[type="text"]:focus {
+  outline: none;
+  border-color: #f59e0b;
+}
+
+.dl-offline-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.dl-offline-actions button {
+  flex: 1;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dl-offline-actions .dl-confirm-btn {
+  background: #ef4444;
+  color: #fff;
+}
+
+.dl-offline-actions .dl-confirm-btn:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.dl-offline-actions .dl-cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.dl-offline-actions .dl-cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ── Location Form ── */
+.dl-coord-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dl-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dl-field input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: #f8fafc;
+  color: #334155;
+  box-sizing: border-box;
+}
+
+.dl-field input:read-only {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.dl-field input:focus {
+  outline: none;
+  border-color: #0d9488;
+}
+
+.dl-field .dl-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.dl-field.full {
+  margin-bottom: 1.25rem;
+}
+
+/* ── Action Buttons ── */
+.dl-action-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.dl-action-btn {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.dl-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dl-action-btn.secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1.5px solid #e2e8f0;
+}
+
+.dl-action-btn.secondary:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.dl-action-btn.primary {
+  background: linear-gradient(135deg, #0f766e, #0d9488);
+  color: #fff;
+}
+
+.dl-action-btn.primary:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ── Info Banner ── */
+.dl-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #f0fdfa;
+  border-radius: 12px;
+  border: 1px solid #99f6e4;
+}
+
+.dl-info-banner i {
+  color: #0d9488;
+  font-size: 1rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+.dl-info-banner p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.5;
+}
+
+/* ── Current Location Summary ── */
+.dl-location-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.dl-loc-item {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.dl-loc-item.full {
+  grid-column: 1 / -1;
+}
+
+.dl-loc-item span {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.dl-loc-item strong {
+  font-size: 0.95rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.dl-loc-item small {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+/* ── Loading ── */
+.dl-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.dl-loading i {
+  font-size: 2rem;
+  color: #0d9488;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .dl-page {
+    padding: 0 1rem 2rem;
+  }
+
+  .dl-banner {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .dl-banner h1 {
+    font-size: 1.3rem;
+  }
+
+  .dl-coord-grid,
+  .dl-action-group,
+  .dl-toggle-group {
+    grid-template-columns: 1fr;
+  }
+
+  .dl-location-summary {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,10 +1,19 @@
 const Car = require('../models/Car');
 
+const fixImageUrl = (car, req) => {
+  const carObj = car.toObject ? car.toObject() : { ...car };
+  if (carObj.image && carObj.image.includes('localhost')) {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    carObj.image = carObj.image.replace(/http:\/\/localhost:\d+/, baseUrl);
+  }
+  return carObj;
+};
+
 // Get all cars
 const getAllCars = async (req, res) => {
   try {
     const cars = await Car.find({ isAvailable: true }).sort({ createdAt: -1 });
-    res.json(cars);
+    res.json(cars.map(c => fixImageUrl(c, req)));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -14,7 +23,7 @@ const getAllCars = async (req, res) => {
 const getAllCarsAdmin = async (req, res) => {
   try {
     const cars = await Car.find().sort({ createdAt: -1 });
-    res.json(cars);
+    res.json(cars.map(c => fixImageUrl(c, req)));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -27,7 +36,7 @@ const getCarById = async (req, res) => {
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
-    res.json(car);
+    res.json(fixImageUrl(car, req));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -36,7 +45,11 @@ const getCarById = async (req, res) => {
 // Create car (admin)
 const createCar = async (req, res) => {
   try {
-    const car = await Car.create(req.body);
+    const carData = { ...req.body };
+    if (req.file) {
+      carData.image = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    }
+    const car = await Car.create(carData);
     res.status(201).json({
       message: 'Car created successfully',
       car
@@ -52,9 +65,13 @@ const createCar = async (req, res) => {
 // Update car (admin)
 const updateCar = async (req, res) => {
   try {
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.image = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    }
     const car = await Car.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -78,7 +95,7 @@ const getAvailableCars = async (req, res) => {
     // For now, return all cars that are marked as available in the generic sense
     // In a real app, we would check against existing bookings for the date range
     const cars = await Car.find({ isAvailable: true }).sort({ createdAt: -1 });
-    res.json(cars);
+    res.json(cars.map(c => fixImageUrl(c, req)));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -27,6 +27,11 @@ const authReducer = (state, action) => {
         isAuthenticated: false,
         loading: false,
       };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: { ...state.user, ...action.payload },
+      };
     case 'SET_LOADING':
       return {
         ...state,
@@ -73,10 +78,17 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGOUT' });
   };
 
+  const updateUser = (userData) => {
+    const merged = { ...state.user, ...userData };
+    localStorage.setItem('user', JSON.stringify(merged));
+    dispatch({ type: 'UPDATE_USER', payload: userData });
+  };
+
   const value = {
     ...state,
     login,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -88,4 +100,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+};a

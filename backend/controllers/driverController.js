@@ -42,7 +42,7 @@ const getLocation = async (req, res) => {
 // Update availability status
 const updateAvailability = async (req, res) => {
   try {
-    const { isAvailable } = req.body;
+    const { isAvailable, offlineReason } = req.body;
 
     const driver = await User.findByIdAndUpdate(
       req.user.id,
@@ -50,14 +50,15 @@ const updateAvailability = async (req, res) => {
       { new: true }
     ).select('-password');
 
-    // Update login time if going online
-    if (isAvailable) {
-      await DriverLocation.findOneAndUpdate(
-        { driverId: req.user.id },
-        { loginTime: new Date() },
-        { upsert: true }
-      );
-    }
+    const updateData = isAvailable
+      ? { loginTime: new Date(), offlineReason: '' }
+      : { offlineReason: offlineReason || '' };
+
+    await DriverLocation.findOneAndUpdate(
+      { driverId: req.user.id },
+      updateData,
+      { upsert: true }
+    );
 
     res.json({
       message: `Driver ${isAvailable ? 'online' : 'offline'}`,
@@ -90,7 +91,9 @@ const getAllDrivers = async (req, res) => {
             latitude: location.latitude,
             longitude: location.longitude,
             address: location.address,
-            lastUpdated: location.lastUpdated
+            lastUpdated: location.lastUpdated,
+            offlineReason: location.offlineReason || '',
+            updatedAt: location.updatedAt
           } : null
         };
       })

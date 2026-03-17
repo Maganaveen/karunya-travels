@@ -1,0 +1,512 @@
+/* ═══════════════════════════════════════════════════
+   Driver Dashboard — Redesign
+   ═══════════════════════════════════════════════════ */
+
+.dd-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+/* ── Welcome Banner ── */
+.dd-welcome {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.dd-welcome::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -5%;
+  width: 320px;
+  height: 320px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dd-welcome-text h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.dd-welcome-text p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.dd-welcome-actions {
+  display: flex;
+  gap: 0.75rem;
+  z-index: 1;
+}
+
+.dd-welcome-actions .dd-btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+
+.dd-btn-light {
+  background: #fff;
+  color: #0f766e;
+}
+
+.dd-btn-light:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.dd-btn-outline {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(4px);
+}
+
+.dd-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* ── Availability Pill ── */
+.dd-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.dd-availability.online {
+  background: rgba(255, 255, 255, 0.2);
+  color: #bbf7d0;
+}
+
+.dd-availability.offline {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fecaca;
+}
+
+.dd-availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dd-availability.online .dd-availability-dot {
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
+}
+
+.dd-availability.offline .dd-availability-dot {
+  background: #f87171;
+}
+
+/* ── Stat Cards ── */
+.dd-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.dd-stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s, box-shadow 0.25s;
+  border: 1px solid #f0f0f0;
+}
+
+.dd-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.dd-stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.dd-stat-icon.teal   { background: rgba(13, 148, 136, 0.12); color: #0d9488; }
+.dd-stat-icon.green  { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.dd-stat-icon.purple { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+.dd-stat-icon.amber  { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+.dd-stat-info h4 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.15rem;
+  line-height: 1;
+}
+
+.dd-stat-info span {
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── Grid Layout ── */
+.dd-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+/* ── Section Card ── */
+.dd-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.dd-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dd-section-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dd-section-header h3 i {
+  color: #0d9488;
+}
+
+.dd-view-all {
+  font-size: 0.85rem;
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: gap 0.2s;
+}
+
+.dd-view-all:hover {
+  gap: 0.55rem;
+}
+
+/* ── Booking Row ── */
+.dd-booking-list {
+  padding: 0.5rem 0;
+}
+
+.dd-booking-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  transition: background 0.15s;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.dd-booking-row:last-child {
+  border-bottom: none;
+}
+
+.dd-booking-row:hover {
+  background: #f8fafc;
+}
+
+.dd-booking-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.dd-booking-icon.assigned   { background: #dbeafe; color: #2563eb; }
+.dd-booking-icon.started,
+.dd-booking-icon.in-progress { background: #e0e7ff; color: #7c3aed; }
+.dd-booking-icon.completed  { background: #d1fae5; color: #059669; }
+.dd-booking-icon.pending    { background: #fef3c7; color: #d97706; }
+
+.dd-booking-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.dd-booking-route {
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dd-booking-meta {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dd-booking-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dd-booking-right {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.dd-booking-amount {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.dd-booking-status {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
+}
+
+.dd-booking-status.pending    { background: #fef3c7; color: #b45309; }
+.dd-booking-status.assigned   { background: #dbeafe; color: #1d4ed8; }
+.dd-booking-status.started,
+.dd-booking-status.in-progress { background: #ede9fe; color: #6d28d9; }
+.dd-booking-status.completed  { background: #d1fae5; color: #047857; }
+
+/* ── Empty State ── */
+.dd-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #94a3b8;
+}
+
+.dd-empty i {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #cbd5e1;
+}
+
+.dd-empty p {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+
+.dd-empty a {
+  color: #0d9488;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dd-empty a:hover {
+  text-decoration: underline;
+}
+
+/* ── Quick Actions (sidebar) ── */
+.dd-quick-actions {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dd-quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #334155;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.dd-quick-btn:hover {
+  background: #f0fdfa;
+  border-color: #99f6e4;
+  color: #0f766e;
+}
+
+.dd-quick-btn i {
+  width: 20px;
+  text-align: center;
+  color: #0d9488;
+}
+
+.dd-quick-btn .fa-chevron-right {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+/* ── Activity Timeline (sidebar) ── */
+.dd-timeline {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.dd-timeline-item {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.dd-timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.dd-timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 34px;
+  bottom: 0;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.dd-timeline-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.dd-timeline-dot.green  { background: #d1fae5; color: #059669; }
+.dd-timeline-dot.blue   { background: #dbeafe; color: #2563eb; }
+.dd-timeline-dot.yellow { background: #fef3c7; color: #d97706; }
+.dd-timeline-dot.purple { background: #ede9fe; color: #7c3aed; }
+
+.dd-timeline-content p {
+  font-size: 0.85rem;
+  color: #334155;
+  margin: 0 0 0.15rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dd-timeline-content small {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* ── Loading ── */
+.dd-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.dd-loading i {
+  font-size: 2rem;
+  color: #0d9488;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .dd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dd-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dd-welcome {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .dd-welcome-actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dd-booking-row {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .dd-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dd-page {
+    padding: 0 1rem 2rem;
+  }
+}

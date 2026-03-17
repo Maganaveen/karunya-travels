@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { adminAPI, bookingsAPI, carsAPI, driversAPI } from '../../services/api';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
+import './AdminDashboard.css';
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState({});
   const [bookings, setBookings] = useState([]);
   const [cars, setCars] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('all');
 
   useEffect(() => {
     fetchAllData();
@@ -17,13 +18,12 @@ const AdminDashboard = () => {
   const fetchAllData = async () => {
     try {
       setLoading(true);
-      const [statsRes, bookingsRes, carsRes, driversRes] = await Promise.all([
+      const [, bookingsRes, carsRes, driversRes] = await Promise.all([
         adminAPI.getDashboardStats(),
         bookingsAPI.getAllBookings(),
         carsAPI.getAllAdmin(),
         driversAPI.getAllDrivers()
       ]);
-      setStats(statsRes.data);
       setBookings(bookingsRes.data || []);
       setCars(carsRes.data || []);
       setDrivers(driversRes.data || []);
@@ -34,226 +34,203 @@ const AdminDashboard = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    const statusClasses = {
-      pending: 'status-pending',
-      assigned: 'status-assigned',
-      started: 'status-started',
-      'in-progress': 'status-started',
-      completed: 'status-completed'
-    };
-    return <span className={`status-badge ${statusClasses[status] || 'status-pending'}`}>{status.toUpperCase()}</span>;
+  const activeBookings = bookings.filter(b => ['assigned', 'started', 'in-progress'].includes(b.status));
+  const completedBookings = bookings.filter(b => b.status === 'completed');
+  const pendingBookings = bookings.filter(b => b.status === 'pending');
+  const totalRevenue = completedBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+  const getFilteredBookings = () => {
+    if (activeTab === 'active') return activeBookings;
+    if (activeTab === 'completed') return completedBookings;
+    if (activeTab === 'pending') return pendingBookings;
+    return bookings;
   };
 
-  const getPaymentStatusBadge = (status) => {
-    const statusMap = {
-      pending: 'status-pending',
-      completed: 'status-completed',
-      failed: 'status-pending'
-    };
-    return <span className={`status-badge ${statusMap[status] || 'status-pending'}`}>{status.toUpperCase()}</span>;
+  const getStatusIcon = (status) => {
+    const icons = { pending: 'fa-clock', assigned: 'fa-user-check', started: 'fa-play', 'in-progress': 'fa-route', completed: 'fa-check-circle' };
+    return icons[status] || 'fa-clock';
   };
-
-  const getActiveBookings = () => bookings.filter(b => ['assigned', 'started', 'in-progress'].includes(b.status));
-  const getCompletedBookings = () => bookings.filter(b => b.status === 'completed');
-  const getTotalRevenue = () => getCompletedBookings().reduce((sum, b) => sum + (b.totalAmount || 0), 0);
 
   if (loading) {
-    return <div className="container" style={{ padding: '2rem', textAlign: 'center' }}>
-      <i className="fas fa-spinner fa-spin" style={{ fontSize: '2rem' }}></i>
-      <p>Loading dashboard...</p>
-    </div>;
+    return (
+      <div className="ad-loading">
+        <i className="fas fa-spinner fa-spin"></i>
+        <p>Loading dashboard...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="section">
-      <div className="container">
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ marginBottom: '0.5rem' }}>Bookings Overview</h2>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <button 
-              className={`btn ${activeTab === 'overview' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setActiveTab('overview')}
-            >
-              <i className="fas fa-chart-bar"></i> Overview
-            </button>
-            <button 
-              className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setActiveTab('bookings')}
-            >
-              <i className="fas fa-calendar-check"></i> Recent Bookings
-            </button>
-            <button 
-              className={`btn ${activeTab === 'cars' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => setActiveTab('cars')}
-            >
-              <i className="fas fa-car"></i> Cars in Rent
-            </button>
+    <div className="ad-page">
+      {/* Welcome Banner */}
+      <div className="ad-welcome">
+        <div className="ad-welcome-text">
+          <h1>Admin Dashboard</h1>
+          <p>Manage bookings, fleet, and drivers — all in one place.</p>
+        </div>
+        <div className="ad-welcome-actions">
+          <Link to="/admin/bookings" className="ad-btn ad-btn-light">
+            <i className="fas fa-calendar-alt"></i> Bookings
+          </Link>
+          <Link to="/admin/cars" className="ad-btn ad-btn-outline">
+            <i className="fas fa-car"></i> Fleet
+          </Link>
+        </div>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="ad-stats">
+        <div className="ad-stat-card">
+          <div className="ad-stat-icon blue"><i className="fas fa-calendar-check"></i></div>
+          <div className="ad-stat-info">
+            <h4>{bookings.length}</h4>
+            <span>Total Bookings</span>
+          </div>
+        </div>
+        <div className="ad-stat-card">
+          <div className="ad-stat-icon green"><i className="fas fa-rupee-sign"></i></div>
+          <div className="ad-stat-info">
+            <h4>₹{totalRevenue.toLocaleString()}</h4>
+            <span>Total Revenue</span>
+          </div>
+        </div>
+        <div className="ad-stat-card">
+          <div className="ad-stat-icon purple"><i className="fas fa-id-badge"></i></div>
+          <div className="ad-stat-info">
+            <h4>{drivers.length}</h4>
+            <span>Drivers</span>
+          </div>
+        </div>
+        <div className="ad-stat-card">
+          <div className="ad-stat-icon orange"><i className="fas fa-car-side"></i></div>
+          <div className="ad-stat-info">
+            <h4>{cars.length}</h4>
+            <span>Fleet Size</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Grid */}
+      <div className="ad-grid">
+        {/* Left — Bookings List */}
+        <div className="ad-section">
+          <div className="ad-section-header">
+            <h3><i className="fas fa-list-alt"></i> Bookings</h3>
+            <div className="ad-tab-group">
+              {['all', 'active', 'pending', 'completed'].map(tab => (
+                <button key={tab} className={`ad-tab ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="ad-booking-list">
+            {getFilteredBookings().length === 0 ? (
+              <div className="ad-empty">
+                <i className="fas fa-inbox"></i>
+                <p>No {activeTab !== 'all' ? activeTab : ''} bookings found</p>
+              </div>
+            ) : (
+              getFilteredBookings().slice(0, 8).map(booking => (
+                <div className="ad-booking-row" key={booking._id}>
+                  <div className={`ad-booking-icon ${booking.status}`}>
+                    <i className={`fas ${getStatusIcon(booking.status)}`}></i>
+                  </div>
+                  <div className="ad-booking-details">
+                    <div className="ad-booking-route">
+                      {booking.pickupLocation?.address || 'Pickup'} → {booking.dropLocation?.address || 'Drop'}
+                    </div>
+                    <div className="ad-booking-meta">
+                      <span><i className="fas fa-user"></i> {booking.userId?.name || 'Unknown'}</span>
+                      <span><i className="fas fa-steering-wheel"></i> {booking.driverId?.name || 'Unassigned'}</span>
+                      <span><i className="fas fa-car"></i> {booking.carId?.name || '—'}</span>
+                    </div>
+                  </div>
+                  <div className="ad-booking-right">
+                    <div className="ad-booking-amount">₹{booking.totalAmount?.toLocaleString() || 0}</div>
+                    <div className={`ad-booking-status ${booking.status}`}>{booking.status}</div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        {activeTab === 'overview' && (
-          <>
-            <div className="grid grid-3" style={{ marginBottom: '2rem' }}>
-              <div className="card">
-                <h4>Total Booking Cap</h4>
-                <h2 style={{ fontSize: '2.5rem', color: '#3b82f6', marginBottom: '0.5rem' }}>₹{getTotalRevenue().toLocaleString()}</h2>
-                <p style={{ color: '#6c757d', marginBottom: '1rem' }}>Completed Bookings</p>
-                <span className="status-badge status-completed">{getCompletedBookings().length}</span>
-              </div>
-
-              <div className="card">
-                <h4>Chome Drivs</h4>
-                <h2 style={{ fontSize: '2.5rem', color: '#10b981', marginBottom: '0.5rem' }}>{drivers.length}</h2>
-                <p style={{ color: '#6c757d', marginBottom: '1rem' }}>Active Drivers</p>
-                <span className="status-badge status-assigned">{getActiveBookings().length}</span>
-              </div>
-
-              <div className="card">
-                <h4>Revenue Tows</h4>
-                <h2 style={{ fontSize: '2.5rem', color: '#f59e0b', marginBottom: '0.5rem' }}>₹{(getTotalRevenue() / 12).toLocaleString()}</h2>
-                <p style={{ color: '#6c757d', marginBottom: '1rem' }}>Monthly Average</p>
-                <button className="btn btn-primary btn-sm">Estimate →</button>
-              </div>
+        {/* Right Sidebar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Revenue Summary */}
+          <div className="ad-section">
+            <div className="ad-section-header">
+              <h3><i className="fas fa-chart-pie"></i> Revenue</h3>
             </div>
-
-            <div className="card">
-              <div style={{ marginBottom: '1rem' }}>
-                <h3>Statistics</h3>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <button className={`btn ${true ? 'btn-primary' : 'btn-secondary'}`}>Renter</button>
-                  <button className="btn btn-secondary">Driver</button>
-                  <button className="btn btn-secondary">Driver</button>
+            <div className="ad-revenue">
+              <div className="ad-revenue-total">
+                <span>Total Earned</span>
+                <h3>₹{totalRevenue.toLocaleString()}</h3>
+              </div>
+              <div className="ad-revenue-breakdown">
+                <div className="ad-revenue-item">
+                  <span className="ad-revenue-label"><i className="fas fa-circle" style={{ color: '#10b981' }}></i> Completed</span>
+                  <span className="ad-revenue-value">{completedBookings.length}</span>
+                </div>
+                <div className="ad-revenue-item">
+                  <span className="ad-revenue-label"><i className="fas fa-circle" style={{ color: '#8b5cf6' }}></i> Active</span>
+                  <span className="ad-revenue-value">{activeBookings.length}</span>
+                </div>
+                <div className="ad-revenue-item">
+                  <span className="ad-revenue-label"><i className="fas fa-circle" style={{ color: '#f59e0b' }}></i> Pending</span>
+                  <span className="ad-revenue-value">{pendingBookings.length}</span>
                 </div>
               </div>
-              <div className="grid grid-4">
-                <div style={{ padding: '1rem', borderRight: '1px solid var(--gray-200)' }}>
-                  <p style={{ color: '#6c757d', marginBottom: '0.5rem' }}>Total Bookings</p>
-                  <h2 style={{ color: '#667eea', marginBottom: '0.5rem' }}>{bookings.length}</h2>
-                  <small style={{ color: '#9ca3af' }}>All time</small>
-                </div>
-                <div style={{ padding: '1rem', borderRight: '1px solid var(--gray-200)' }}>
-                  <p style={{ color: '#6c757d', marginBottom: '0.5rem' }}>Active Now</p>
-                  <h2 style={{ color: '#10b981', marginBottom: '0.5rem' }}>{getActiveBookings().length}</h2>
-                  <small style={{ color: '#9ca3af' }}>In progress</small>
-                </div>
-                <div style={{ padding: '1rem', borderRight: '1px solid var(--gray-200)' }}>
-                  <p style={{ color: '#6c757d', marginBottom: '0.5rem' }}>Completed</p>
-                  <h2 style={{ color: '#667eea', marginBottom: '0.5rem' }}>{getCompletedBookings().length}</h2>
-                  <small style={{ color: '#9ca3af' }}>Finished</small>
-                </div>
-                <div style={{ padding: '1rem' }}>
-                  <p style={{ color: '#6c757d', marginBottom: '0.5rem' }}>Total Cars</p>
-                  <h2 style={{ color: '#667eea', marginBottom: '0.5rem' }}>{cars.length}</h2>
-                  <small style={{ color: '#9ca3af' }}>Fleet</small>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {activeTab === 'bookings' && (
-          <div className="card">
-            <h3 style={{ marginBottom: '1.5rem' }}>Recent Bookings</h3>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Customer ID</th>
-                    <th>Customer Name</th>
-                    <th>Driver</th>
-                    <th>Booking ID</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Payment</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.slice(0, 10).map((booking) => (
-                    <tr key={booking._id}>
-                      <td>#{booking.userId?._id?.slice(-6) || 'N/A'}</td>
-                      <td>
-                        <strong>{booking.userId?.name || 'Unknown'}</strong><br />
-                        <small style={{ color: '#6c757d' }}>{booking.userId?.email}</small>
-                      </td>
-                      <td>
-                        {booking.driverId ? (
-                          <>
-                            <strong>{booking.driverId.name}</strong><br />
-                            <small style={{ color: '#6c757d' }}>{booking.driverId.phone}</small>
-                          </>
-                        ) : (
-                          <span style={{ color: '#6c757d' }}>Not Assigned</span>
-                        )}
-                      </td>
-                      <td>#{booking._id?.slice(-6)}</td>
-                      <td>₹{booking.totalAmount}</td>
-                      <td>{getStatusBadge(booking.status)}</td>
-                      <td>{getPaymentStatusBadge(booking.paymentStatus || 'pending')}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
-        )}
 
-        {activeTab === 'cars' && (
-          <div className="card">
-            <h3 style={{ marginBottom: '1.5rem' }}>Cars in Rent</h3>
-            <div style={{ overflowX: 'auto' }}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Car ID</th>
-                    <th>Car Name & Number</th>
-                    <th>Driver Assigned</th>
-                    <th>Current Booking</th>
-                    <th>Customer</th>
-                    <th>Pickup Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.filter(b => ['assigned', 'started', 'in-progress'].includes(b.status)).map((booking) => (
-                    <tr key={booking._id}>
-                      <td>#{booking.carId?._id?.slice(-6) || 'N/A'}</td>
-                      <td>
-                        <strong>{booking.carId?.name || 'Unknown'}</strong><br />
-                        <small style={{ color: '#6c757d' }}>{booking.carId?.number}</small>
-                      </td>
-                      <td>
-                        {booking.driverId ? (
-                          <>
-                            <strong>{booking.driverId.name}</strong><br />
-                            <small style={{ color: '#6c757d' }}>{booking.driverId.phone}</small>
-                          </>
-                        ) : (
-                          <span style={{ color: '#6c757d' }}>Not Assigned</span>
-                        )}
-                      </td>
-                      <td>#{booking._id?.slice(-6)}</td>
-                      <td>
-                        <strong>{booking.userId?.name || 'Unknown'}</strong><br />
-                        <small style={{ color: '#6c757d' }}>{booking.userId?.phone}</small>
-                      </td>
-                      <td>
-                        {new Date(booking.pickupDateTime).toLocaleDateString()}<br />
-                        <small style={{ color: '#6c757d' }}>{new Date(booking.pickupDateTime).toLocaleTimeString()}</small>
-                      </td>
-                      <td>{getStatusBadge(booking.status)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {bookings.filter(b => ['assigned', 'started', 'in-progress'].includes(b.status)).length === 0 && (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#6c757d' }}>
-                  <p>No cars currently rented</p>
+          {/* Cars in Rent */}
+          <div className="ad-section">
+            <div className="ad-section-header">
+              <h3><i className="fas fa-car"></i> Cars in Rent</h3>
+              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>{activeBookings.length} active</span>
+            </div>
+            {activeBookings.length === 0 ? (
+              <div className="ad-empty">
+                <i className="fas fa-parking"></i>
+                <p>No cars currently rented</p>
+              </div>
+            ) : (
+              activeBookings.slice(0, 4).map(b => (
+                <div className="ad-fleet-row" key={b._id}>
+                  <div className="ad-fleet-icon"><i className="fas fa-car"></i></div>
+                  <div className="ad-fleet-details">
+                    <div className="ad-fleet-name">{b.carId?.name || 'Unknown Car'}</div>
+                    <div className="ad-fleet-meta">{b.driverId?.name || 'No driver'} • {b.userId?.name || 'Unknown'}</div>
+                  </div>
+                  <div className={`ad-booking-status ${b.status}`}>{b.status}</div>
                 </div>
-              )}
+              ))
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="ad-section">
+            <div className="ad-section-header">
+              <h3><i className="fas fa-bolt"></i> Quick Actions</h3>
+            </div>
+            <div className="ad-quick-actions">
+              <Link to="/admin/bookings" className="ad-quick-btn">
+                <i className="fas fa-calendar-alt"></i> Manage Bookings <i className="fas fa-chevron-right"></i>
+              </Link>
+              <Link to="/admin/drivers" className="ad-quick-btn">
+                <i className="fas fa-id-badge"></i> Manage Drivers <i className="fas fa-chevron-right"></i>
+              </Link>
+              <Link to="/admin/cars" className="ad-quick-btn">
+                <i className="fas fa-car-side"></i> Manage Fleet <i className="fas fa-chevron-right"></i>
+              </Link>
+              <Link to="/admin/reports" className="ad-quick-btn">
+                <i className="fas fa-chart-bar"></i> View Reports <i className="fas fa-chevron-right"></i>
+              </Link>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
