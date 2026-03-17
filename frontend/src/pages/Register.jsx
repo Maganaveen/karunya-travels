@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-rimport { authAPI } from '../services/api';
+import { authAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
