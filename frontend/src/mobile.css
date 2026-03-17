@@ -1,0 +1,623 @@
+/* ===== MOBILE RESPONSIVE STYLES ===== */
+
+/* Mobile sidebar overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+/* ===== Tablet (max-width: 1024px) ===== */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .invoice-details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-container {
+    padding: 2rem;
+  }
+}
+
+/* ===== Mobile (max-width: 768px) ===== */
+@media (max-width: 768px) {
+  /* --- Layout & Sidebar --- */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar.collapsed {
+    width: 280px;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.collapsed.mobile-open {
+    transform: translateX(0);
+  }
+
+  .sidebar.collapsed .logo-text,
+  .sidebar.collapsed .nav-link span,
+  .sidebar.collapsed .user-details {
+    display: block;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+  }
+
+  .sidebar.collapsed + .main-content {
+    margin-left: 0;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .top-bar {
+    padding: 0.75rem 1rem;
+  }
+
+  .top-bar-right .user-profile {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .top-bar-right .user-profile .status-badge {
+    display: none;
+  }
+
+  /* --- Typography --- */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; margin-bottom: 1rem; }
+  h3 { font-size: 1.25rem; }
+
+  .container {
+    padding: 0 1rem;
+  }
+
+  .section {
+    padding: 2rem 0;
+  }
+
+  /* --- Grid System --- */
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+
+  /* --- Cards --- */
+  .card {
+    padding: 1rem;
+  }
+
+  /* --- Tables --- */
+  .table-responsive,
+  .card > div[style*="overflowX"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table {
+    min-width: 600px;
+  }
+
+  .bookings-table {
+    min-width: 600px;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  /* --- Hero Section --- */
+  .hero-section {
+    min-height: 400px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+    white-space: normal;
+  }
+
+  .hero-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* --- Booking Form --- */
+  .booking-form {
+    min-width: unset;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    transform: scale(0.85);
+    transform-origin: top center;
+  }
+
+  .booking-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Car Categories --- */
+  .car-categories {
+    grid-template-columns: 1fr;
+  }
+
+  .car-category {
+    padding: 1.25rem;
+  }
+
+  /* --- Steps Zigzag --- */
+  .steps-zigzag {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .steps-zigzag::before {
+    display: none;
+  }
+
+  .step-item {
+    transform: none !important;
+    max-width: 100%;
+  }
+
+  /* --- Features Grid --- */
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-item {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  /* --- CTA Section --- */
+  .cta-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  /* --- Section Header --- */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  /* --- Start Journey Page --- */
+  .journey-hero-section {
+    height: 220px;
+    padding: 0 1rem;
+  }
+
+  .journey-hero-title {
+    font-size: 2rem;
+  }
+
+  .journey-hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .journey-container {
+    padding: 0 1rem 2rem;
+    margin-top: -40px;
+  }
+
+  .planner-card,
+  .summary-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .card-header-styled {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .places-section-styled {
+    padding: 1.25rem;
+  }
+
+  .spots-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .summary-stat .stat-value {
+    font-size: 1.25rem;
+  }
+
+  .cars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .places-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  /* --- Booking Details --- */
+  .booking-container {
+    grid-template-columns: 1fr;
+  }
+
+  .car-summary-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .journey-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Available Cars Page --- */
+  .cars-filters-section {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-panel {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .cars-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .cars-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  /* --- Analytics --- */
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .period-selector {
+    flex-wrap: wrap;
+  }
+
+  .chart-bars {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* --- Login / Register --- */
+  .login-modal {
+    max-width: 95%;
+    padding: 1.5rem;
+    max-height: 95vh;
+    overflow-y: auto;
+  }
+
+  .register-modal {
+    max-width: 95%;
+  }
+
+  .login-header {
+    flex-wrap: wrap;
+  }
+
+  /* --- Invoice --- */
+  .invoice-overlay {
+    padding: 0.5rem;
+  }
+
+  .invoice-container {
+    padding: 1.5rem;
+    border-radius: 12px;
+    max-height: 95vh;
+  }
+
+  .invoice-details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .invoice-actions {
+    flex-direction: column;
+  }
+
+  .invoice-header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* --- About Us --- */
+  .hero-modern {
+    flex-direction: column;
+    text-align: center;
+    padding: 80px 5% 40px;
+    min-height: auto;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-stats {
+    justify-content: center;
+  }
+
+  .story-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .visual-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .visual-card {
+    padding: 1.5rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-modern.featured {
+    transform: none;
+  }
+
+  .contact-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* About Us Redesign */
+  .hero-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-visual {
+    height: 200px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Admin Dashboard --- */
+  .grid-4 > div[style*="borderRight"] {
+    border-right: none !important;
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: 1rem !important;
+  }
+
+  /* --- Conditions / Rentals --- */
+  .rental-option {
+    padding: 1.5rem;
+  }
+
+  .process-steps {
+    flex-direction: column;
+  }
+
+  .step {
+    margin: 0 0 1.5rem 0;
+  }
+
+  /* --- Tourist Spots --- */
+  .tourist-spots-container {
+    grid-template-columns: 1fr;
+  }
+
+  /* --- Detail Rows --- */
+  .detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detail-value {
+    text-align: left;
+  }
+
+  /* --- Payment Modal --- */
+  .payment-methods {
+    flex-wrap: wrap;
+  }
+
+  /* --- Buttons --- */
+  .btn-lg {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* --- User Profile in Top Bar --- */
+  .user-profile > div[style*="flexDirection: column"] span:first-child {
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ===== Small Mobile (max-width: 480px) ===== */
+@media (max-width: 480px) {
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .content {
+    padding: 0.75rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  /* Hero */
+  .hero-section {
+    min-height: 350px;
+  }
+
+  .hero-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .booking-form {
+    padding: 0.75rem;
+    transform: scale(0.8);
+    transform-origin: top center;
+  }
+
+  /* Start Journey */
+  .journey-hero-section {
+    height: 180px;
+  }
+
+  .journey-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .planner-card,
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-btn-styled {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+
+  /* Navbar */
+  .navbar-logo span {
+    font-size: 1.2rem;
+  }
+
+  .navbar-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  /* Login */
+  .login-modal {
+    padding: 1.25rem;
+  }
+
+  .login-title {
+    font-size: 1.25rem;
+  }
+
+  .credential-card {
+    padding: 0.6rem;
+  }
+
+  /* Invoice */
+  .invoice-container {
+    padding: 1rem;
+  }
+
+  .invoice-section {
+    padding: 1rem;
+  }
+
+  /* About */
+  .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .section-intro h2,
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .feature-card,
+  .mission-card,
+  .vision-card,
+  .team-member {
+    padding: 1.5rem;
+  }
+
+  .cta-card {
+    padding: 2rem 1.5rem;
+  }
+
+  /* Tables - card view on very small screens */
+  .table {
+    min-width: 500px;
+  }
+}

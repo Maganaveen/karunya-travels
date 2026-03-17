@@ -95,6 +95,7 @@ const AdminBookings = () => {
         {bookings.length === 0 ? (
           <p>No bookings found.</p>
         ) : (
+          <div style={{ overflowX: 'auto' }}>
           <table className="table">
             <thead>
               <tr>
@@ -200,6 +201,7 @@ const AdminBookings = () => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

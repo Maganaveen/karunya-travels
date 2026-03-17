@@ -73,6 +73,7 @@ const CustomerDashboard = () => {
         {bookings.length === 0 ? (
           <p>No bookings found. <a href="/customer/cars">Book your first car!</a></p>
         ) : (
+          <div style={{ overflowX: 'auto' }}>
           <table className="table">
             <thead>
               <tr>
@@ -99,6 +100,7 @@ const CustomerDashboard = () => {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
