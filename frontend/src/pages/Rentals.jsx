@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { bookingsAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-a
+
 const Rentals = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
