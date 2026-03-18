@@ -356,6 +356,7 @@ out body 50;`;
       };
       
       await bookingsAPI.create(bookingData);
+      console.log('bookingData',bookingData);
       toast.success('Booking confirmed! Confirmation email sent.');
       navigate('/customer/bookings');
     } catch (error) {
@@ -498,6 +499,12 @@ TERMS & CONDITIONS
       {/* Hero Section */}
       <div className="journey-hero-section">
         <div className="journey-hero-bg-overlay"></div>
+        <button
+          className="journey-back-btn"
+          onClick={() => navigate(-1)}
+        >
+          <i className="fas fa-arrow-left"></i> Back
+        </button>
         <div className="journey-hero-content">
           <h1 className="journey-hero-title">Start Your Adventure</h1>
           <p className="journey-hero-subtitle">Experience the freedom of the road. Plan your perfect trip with our intelligent journey planner. Discover new places, estimate costs, and book your ideal ride.</p>

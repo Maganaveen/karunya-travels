@@ -29,6 +29,33 @@ h6 {
     color: #2563eb;
 }
 
+/* --- Back Button --- */
+.journey-back-btn {
+    position: absolute;
+    top: 1.5rem;
+    left: 2rem;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.journey-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-3px);
+}
+
 /* --- Hero Section --- */
 .journey-hero-section {
     position: relative;

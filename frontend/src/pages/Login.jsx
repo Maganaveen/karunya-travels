@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -23,6 +23,15 @@ const Login = () => {
     document.querySelector('input[name="password"]').value = password;
   };
 
+  const { isAuthenticated, user: authUser } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && authUser?.role) {
+      const path = authUser.role === 'admin' ? '/admin/dashboard' : authUser.role === 'driver' ? '/driver/dashboard' : '/customer/dashboard';
+      navigate(path, { replace: true });
+    }
+  }, [isAuthenticated, authUser, navigate]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
@@ -31,18 +40,6 @@ const Login = () => {
 
       login(token, user);
       toast.success('Login successful!');
-
-      // Redirect based on role
-      switch (user.role) {
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'driver':
-          navigate('/driver/dashboard');
-          break;
-        default:
-          navigate('/customer/dashboard');
-      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
     } finally {

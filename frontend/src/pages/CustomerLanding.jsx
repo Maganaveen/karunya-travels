@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { bookingsAPI } from '../services/api';
 import LandingNavbar from '../components/LandingNavbar';
+import LocationAutocomplete from '../components/LocationAutocomplete';
 import { toast } from 'react-toastify';
 
 const CustomerLanding = () => {
@@ -19,7 +20,7 @@ const CustomerLanding = () => {
   const [showOtp, setShowOtp] = useState(false);
   const [message, setMessage] = useState('');
   const [currentSlide, setCurrentSlide] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [cardDetails, setCardDetails] = useState({
     number: '',
     expiry: '',
@@ -141,26 +142,18 @@ const CustomerLanding = () => {
                 // Slide 1: Booking Details
                 <>
                   <div className="form-row">
-                    <div className="form-group">
-                      <label>Pickup Location</label>
-                      <input
-                        type="text"
-                        placeholder="Enter pickup location"
-                        value={pickupLocation}
-                        onChange={(e) => setPickupLocation(e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Drop Location</label>
-                      <input
-                        type="text"
-                        placeholder="Enter drop location"
-                        value={dropLocation}
-                        onChange={(e) => setDropLocation(e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
+                    <LocationAutocomplete
+                      label="Pickup Location"
+                      placeholder="Enter pickup location"
+                      value={pickupLocation}
+                      onChange={setPickupLocation}
+                    />
+                    <LocationAutocomplete
+                      label="Drop Location"
+                      placeholder="Enter drop location"
+                      value={dropLocation}
+                      onChange={setDropLocation}
+                    />
                   </div>
                   <div className="form-row">
                     <div className="form-group">
@@ -231,81 +224,173 @@ const CustomerLanding = () => {
                     </button>
                   </div>
                   
-                  <div className="form-group">
-                    <h6>Booking Summary</h6>
-                    <div className="booking-summary">
-                      <p className="mb-1"><strong>From:</strong> {pickupLocation}</p>
-                      <p className="mb-1"><strong>To:</strong> {dropLocation}</p>
-                      <p className="mb-1"><strong>Date:</strong> {pickupDate} at {pickupTime}</p>
-                      <p className="mb-1"><strong>Distance:</strong> ~{estimatedDistance} km</p>
-                      <p className="mb-0"><strong>Estimated:</strong> ₹{estimatedPrice}</p>
+                  <div className="booking-summary-card">
+                    <div className="summary-card-header">
+                      <i className="fas fa-receipt"></i>
+                      <h6>Booking Summary</h6>
+                    </div>
+                    <div className="summary-card-body">
+                      <div className="summary-route">
+                        <div className="summary-row">
+                          <div className="summary-icon pickup"><i className="fas fa-circle"></i></div>
+                          <div className="summary-info">
+                            <span className="summary-label">Pickup</span>
+                            <span className="summary-value">{pickupLocation}</span>
+                          </div>
+                        </div>
+                        <div className="summary-line"></div>
+                        <div className="summary-row">
+                          <div className="summary-icon drop"><i className="fas fa-map-marker-alt"></i></div>
+                          <div className="summary-info">
+                            <span className="summary-label">Drop</span>
+                            <span className="summary-value">{dropLocation}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="summary-divider"></div>
+                      <div className="summary-details">
+                        <div className="summary-detail-item">
+                          <i className="fas fa-calendar-alt"></i>
+                          <span>{pickupDate} at {pickupTime}</span>
+                        </div>
+                        <div className="summary-detail-item">
+                          <i className="fas fa-road"></i>
+                          <span>~{estimatedDistance} km</span>
+                        </div>
+                      </div>
+                      <div className="summary-price">
+                        <span>Estimated Fare</span>
+                        <strong>₹{estimatedPrice}</strong>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="form-group">
                     <label className="form-label">Payment Method</label>
-                    <div className="payment-methods">
-                      <button
-                        className={`btn btn-sm ${paymentMethod === 'card' ? 'btn-primary' : 'btn-outline-primary'}`}
+                    <div className="payment-method-cards">
+                      {/* <div
+                        className={`payment-method-card ${paymentMethod === 'card' ? 'active' : ''}`}
                         onClick={() => setPaymentMethod('card')}
                       >
-                        Card
-                      </button>
-                      <button
-                        className={`btn btn-sm ${paymentMethod === 'cash' ? 'btn-primary' : 'btn-outline-primary'}`}
-                        onClick={() => setPaymentMethod('cash')}
-                      >
-                        Cash
-                      </button>
-                      <button
-                        className={`btn btn-sm ${paymentMethod === 'upi' ? 'btn-primary' : 'btn-outline-primary'}`}
+                        <i className="fas fa-credit-card"></i>
+                        <span>Card</span>
+                      </div> */}
+                      <div
+                        className={`payment-method-card ${paymentMethod === 'upi' ? 'active' : ''}`}
                         onClick={() => setPaymentMethod('upi')}
                       >
-                        UPI
-                      </button>
+                        <i className="fas fa-qrcode"></i>
+                        <span>UPI</span>
+                      </div>
+                      <div
+                        className={`payment-method-card ${paymentMethod === 'cash' ? 'active' : ''}`}
+                        onClick={() => setPaymentMethod('cash')}
+                      >
+                        <i className="fas fa-money-bill-wave"></i>
+                        <span>Cash</span>
+                      </div>
                     </div>
                   </div>
                   {paymentMethod === 'card' && (
-                    <>
+                    <div className="card-payment-section">
                       <div className="form-group">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Card Number"
-                          value={cardDetails.number}
-                          onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
-                        />
+                        <label>Card Number</label>
+                        <div className="input-icon-wrapper">
+                          <i className="far fa-credit-card"></i>
+                          <input
+                            type="text"
+                            className="form-control icon-input"
+                            placeholder="1234 5678 9012 3456"
+                            value={cardDetails.number}
+                            onChange={(e) => setCardDetails({ ...cardDetails, number: e.target.value })}
+                            maxLength="19"
+                          />
+                        </div>
                       </div>
                       <div className="form-row">
                         <div className="form-group">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="MM/YY"
-                            value={cardDetails.expiry}
-                            onChange={(e) => setCardDetails({ ...cardDetails, expiry: e.target.value })}
-                          />
+                          <label>Expiry</label>
+                          <div className="input-icon-wrapper">
+                            <i className="far fa-calendar"></i>
+                            <input
+                              type="text"
+                              className="form-control icon-input"
+                              placeholder="MM/YY"
+                              value={cardDetails.expiry}
+                              onChange={(e) => setCardDetails({ ...cardDetails, expiry: e.target.value })}
+                              maxLength="5"
+                            />
+                          </div>
                         </div>
                         <div className="form-group">
+                          <label>CVV</label>
+                          <div className="input-icon-wrapper">
+                            <i className="fas fa-lock"></i>
+                            <input
+                              type="password"
+                              className="form-control icon-input"
+                              placeholder="•••"
+                              value={cardDetails.cvv}
+                              onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
+                              maxLength="4"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Cardholder Name</label>
+                        <div className="input-icon-wrapper">
+                          <i className="far fa-user"></i>
                           <input
                             type="text"
-                            className="form-control"
-                            placeholder="CVV"
-                            value={cardDetails.cvv}
-                            onChange={(e) => setCardDetails({ ...cardDetails, cvv: e.target.value })}
+                            className="form-control icon-input"
+                            placeholder="Name on card"
+                            value={cardDetails.name}
+                            onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
                           />
                         </div>
                       </div>
+                      <div className="card-secure-badge">
+                        <i className="fas fa-shield-alt"></i>
+                        <span>Your payment is secured with 256-bit encryption</span>
+                      </div>
+                    </div>
+                  )}
+                  {paymentMethod === 'upi' && (
+                    <div className="upi-payment-section">
+                      <div className="upi-qr-container">
+                        <p className="upi-scan-text">Scan QR to pay ₹{estimatedPrice}</p>
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=karunyatravels@upi&pn=Karunya%20Travels&am=${estimatedPrice}&cu=INR`}
+                          alt="UPI QR Code"
+                          className="upi-qr-image"
+                        />
+                        <div className="upi-id-display">
+                          <span>UPI ID:</span>
+                          <strong>karunyatravels@upi</strong>
+                        </div>
+                      </div>
+                      <div className="upi-divider"><span>or pay via UPI ID</span></div>
                       <div className="form-group">
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Cardholder Name"
-                          value={cardDetails.name}
-                          onChange={(e) => setCardDetails({ ...cardDetails, name: e.target.value })}
+                          placeholder="Enter your UPI ID (e.g. name@upi)"
                         />
                       </div>
-                    </>
+                    </div>
+                  )}
+                  {paymentMethod === 'cash' && (
+                    <div className="cash-payment-section">
+                      <div className="cash-info">
+                        <div className="cash-icon-circle">
+                          <i className="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h6>Pay with Cash</h6>
+                        <p className="cash-amount">₹{estimatedPrice}</p>
+                        <p>Pay the driver in cash at the time of pickup. No advance payment required.</p>
+                      </div>
+                    </div>
                   )}
                   {!showOtp ? (
                     <div className="form-group">
@@ -518,6 +603,15 @@ const CustomerLanding = () => {
           </div>
         </section>
       </div>
+
+      {/* Call Button - Bottom Left */}
+      <a
+        href="tel:9626566567"
+        className="call-float-btn"
+        title="Call Us"
+      >
+        <i className="fas fa-phone-alt"></i>
+      </a>
     </>
   );
 };

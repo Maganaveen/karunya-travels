@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -21,13 +21,20 @@ const Register = () => {
 
       login(token, user);
       toast.success('Registration successful!');
-      navigate('/customer/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
+
+  const { isAuthenticated, user: authUser } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && authUser?.role) {
+      navigate(`/${authUser.role === 'admin' ? 'admin' : authUser.role === 'driver' ? 'driver' : 'customer'}/dashboard`, { replace: true });
+    }
+  }, [isAuthenticated, authUser, navigate]);
 
   return (
     <div className="register-page">
