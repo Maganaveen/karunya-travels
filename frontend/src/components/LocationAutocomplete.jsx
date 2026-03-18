@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import indianLocations from '../data/indianLocations';
+import indianLocations from '../data/indianLocation';
 
 const LocationAutocomplete = ({ value, onChange, placeholder, label }) => {
   const [suggestions, setSuggestions] = useState([]);
