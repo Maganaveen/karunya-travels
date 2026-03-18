@@ -257,4 +257,4 @@ if (require.main === module) {
   seedDatabase();
 }
 
-module.exports = { Location, seedDatabase, seedData };a
+module.exports = { Location, seedDatabase, seedData };
