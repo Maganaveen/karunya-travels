@@ -50,15 +50,20 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
 
-    if (token && user) {
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: {
-          token,
-          user: JSON.parse(user),
-        },
-      });
+    if (token && user && user !== 'undefined') {
+      try {
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: { token, user: JSON.parse(user) },
+        });
+      } catch {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
     } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
