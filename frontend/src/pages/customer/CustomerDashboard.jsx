@@ -19,7 +19,9 @@ const CustomerDashboard = () => {
       const response = await bookingsAPI.getUserBookings();
       setBookings(response.data);
     } catch (error) {
-      toast.error('Failed to fetch bookings');
+      if (error.response?.status !== 401) {
+        toast.error('Failed to fetch bookings');
+      }
     } finally {
       setLoading(false);
     }

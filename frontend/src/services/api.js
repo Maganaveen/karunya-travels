@@ -23,13 +23,28 @@ api.interceptors.request.use((config) => {
 });
 
 // Handle auth errors
+let isLoggingOut = false;
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401 && !error.config.url?.includes('/auth/')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+    if (
+      error.response?.status === 401 &&
+      !originalRequest.url?.includes('/auth/') &&
+      !originalRequest._retry
+    ) {
+      originalRequest._retry = true;
+      const token = localStorage.getItem('token');
+      if (token) {
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return api(originalRequest);
+      }
+      if (!isLoggingOut) {
+        isLoggingOut = true;
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
