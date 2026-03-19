@@ -21,6 +21,9 @@ const Register = () => {
 
       login(token, user);
       toast.success('Registration successful!');
+
+      const path = user.role === 'admin' ? '/admin/dashboard' : user.role === 'driver' ? '/driver/dashboard' : '/customer/dashboard';
+      navigate(path, { replace: true });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Registration failed');
     } finally {

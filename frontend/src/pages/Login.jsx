@@ -40,6 +40,9 @@ const Login = () => {
 
       login(token, user);
       toast.success('Login successful!');
+
+      const path = user.role === 'admin' ? '/admin/dashboard' : user.role === 'driver' ? '/driver/dashboard' : '/customer/dashboard';
+      navigate(path, { replace: true });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
     } finally {
