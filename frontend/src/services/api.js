@@ -44,6 +44,7 @@ api.interceptors.response.use(
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
+        setTimeout(() => { isLoggingOut = false; }, 1000);
       }
     }
     return Promise.reject(error);
