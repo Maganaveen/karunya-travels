@@ -152,12 +152,10 @@ const createSampleData = async () => {
     await Car.insertMany(sampleCars);
     console.log('Sample cars reset and seeded successfully');
 
-    // Seed locations
-    const locationCount = await Location.countDocuments();
-    if (locationCount === 0) {
-      await Location.insertMany(seedData);
-      console.log('Sample locations created');
-    }
+    // Seed locations (force re-seed to ensure data is present)
+    await Location.deleteMany({});
+    await Location.insertMany(seedData);
+    console.log('Sample locations reset and seeded successfully');
   } catch (error) {
     console.error('Error creating sample data:', error);
   }
