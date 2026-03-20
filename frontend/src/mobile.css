@@ -74,7 +74,8 @@
 
   /* --- Hero Section --- */
   .hero-section {
-    min-height: 400px;
+    min-height: auto;
+    padding: 2rem 0;
   }
 
   .hero-text h1 {
@@ -94,8 +95,6 @@
     margin-left: 0;
     margin-top: 1.5rem;
     padding: 1rem;
-    transform: scale(0.85);
-    transform-origin: top center;
   }
 
   .booking-form .form-row {
@@ -463,8 +462,6 @@
 
   .booking-form {
     padding: 0.75rem;
-    transform: scale(0.8);
-    transform-origin: top center;
   }
 
   /* Start Journey */
@@ -552,4 +549,3 @@
     min-width: 500px;
   }
 }
-l

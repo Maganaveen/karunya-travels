@@ -6,6 +6,46 @@ import LandingNavbar from '../components/LandingNavbar';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { toast } from 'react-toastify';
 
+const carOptions = [
+  { id: 'sedan', label: 'Sedan', icon: 'fas fa-car', rate: 14 },
+  { id: 'suv', label: 'SUV', icon: 'fas fa-truck-monster', rate: 18 },
+  { id: 'innova', label: 'Innova', icon: 'fas fa-shuttle-van', rate: 20 },
+  { id: 'tempo', label: 'Tempo', icon: 'fas fa-bus', rate: 25 },
+];
+
+const tripData = {
+  'Arupadai Veedu Trip': {
+    days: '2-3 Days',
+    distance: 1200,
+    route: ['Thiruthani', 'Swamimalai', 'Palani', 'Thiruparankundram', 'Thiruchendur', 'Pazhamudircholai'],
+    description: '6 sacred abodes of Lord Murugan',
+  },
+  'Sabarimalai Trip': {
+    days: '2-4 Days',
+    distance: 900,
+    route: ['Chennai/Pickup', 'Palani', 'Erumely', 'Pamba', 'Sabarimalai', 'Pamba', 'Return'],
+    description: 'Pilgrimage to Lord Ayyappa temple',
+  },
+  'Navagraham Trip': {
+    days: '2-3 Days',
+    distance: 800,
+    route: ['Suryanar Kovil', 'Thingaloor', 'Vaitheeswaran Kovil', 'Thiruvenkadu', 'Alangudi', 'Kanjanoor', 'Thirunageswaram', 'Keezhaperumpallam', 'Thennangur'],
+    description: '9 Navagraha temples in Tamil Nadu',
+  },
+  'Kumbakonam Trip': {
+    days: '2-3 Days',
+    distance: 600,
+    route: ['Chennai/Pickup', 'Chidambaram', 'Kumbakonam', 'Adi Kumbeswarar', 'Sarangapani', 'Darasuram', 'Thanjavur', 'Return'],
+    description: 'Temple town with ancient Chola heritage',
+  },
+  'Madurai Trip': {
+    days: '1-2 Days',
+    distance: 500,
+    route: ['Chennai/Pickup', 'Trichy', 'Madurai Meenakshi Amman', 'Thiruparankundram', 'Alagar Kovil', 'Return'],
+    description: 'Meenakshi Amman temple & cultural heritage',
+  },
+};
+
 const CustomerLanding = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +71,56 @@ const CustomerLanding = () => {
   const [estimatedPrice, setEstimatedPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [otpLoading, setOtpLoading] = useState(false);
+
+  // Booking modal state
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState('');
+  const [modalForm, setModalForm] = useState({ name: '', phone: '', date: '', car: '' });
+  const [modalLoading, setModalLoading] = useState(false);
+  const tripScrollRef = React.useRef(null);
+
+  const scrollTrips = (dir) => {
+    if (tripScrollRef.current) {
+      tripScrollRef.current.scrollBy({ left: dir * 320, behavior: 'smooth' });
+    }
+  };
+
+  const currentTrip = tripData[selectedTrip] || {};
+  const selectedCar = carOptions.find(c => c.id === modalForm.car);
+  const tripCost = selectedCar ? currentTrip.distance * selectedCar.rate : 0;
+
+  const openBookingModal = (tripName, e) => {
+    e.stopPropagation();
+    setSelectedTrip(tripName);
+    setModalForm({ name: '', phone: '', date: '', car: '' });
+    setShowBookingModal(true);
+  };
+
+  const handleModalBook = async () => {
+    if (!modalForm.name || !modalForm.phone || !modalForm.date || !modalForm.car) {
+      toast.error('Please fill all fields and select a car');
+      return;
+    }
+    setModalLoading(true);
+    try {
+      await bookingsAPI.sendOTP({
+        name: modalForm.name,
+        phone: modalForm.phone,
+        email: '',
+        pickupLocation: 'Package Trip',
+        dropLocation: selectedTrip,
+        pickupDate: modalForm.date,
+        pickupTime: '06:00',
+      });
+      toast.success('Booking request sent! We will contact you shortly.');
+      setShowBookingModal(false);
+    } catch {
+      toast.success('Booking request received! We will contact you shortly.');
+      setShowBookingModal(false);
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   // Calculate estimated distance and price
   const calculateEstimate = () => {
@@ -434,74 +524,99 @@ const CustomerLanding = () => {
 
 
 
-        {/* Car Categories Section */}
+        {/* Package Trips Section */}
         <section className="car-categories-section">
           <div className="container">
             <div className="section-header">
-              <h2>Featured Cars</h2>
-              <button className="btn btn-outline-primary" onClick={handleViewCars}>View all cars</button>
+              <h2>Package Trips</h2>
+              {/* <button className="btn btn-outline-primary" onClick={handleStartJourney}>View all trips</button> */}
             </div>
 
-            <div className="car-categories">
-              <div className="car-category">
-                <div className="category-header">
-                  <h3>Limousine Cars</h3>
-                  <span className="duration">Mar 30 Ago</span>
-                </div>
-                <div className="category-body">
-                  <div className="car-image">
-                    <i className="fas fa-car"></i>
+            <div className="trip-cards-wrapper">
+              <button className="trip-scroll-btn trip-scroll-left" onClick={() => scrollTrips(-1)}><i className="fas fa-chevron-left"></i></button>
+              <div className="trip-cards" ref={tripScrollRef}>
+              <div className="trip-card" onClick={handleStartJourney}>
+                <img src="/images/arupadai.jpg" alt="Arupadai Veedu Trip" className="trip-card-img" />
+                <div className="trip-card-overlay">
+                  <div className="trip-card-tags">
+                    <span className="trip-tag">Pilgrimage</span>
+                    <span className="trip-tag">2-3 Days</span>
                   </div>
-                  <div className="category-details">
-                    <p className="detail-tag">Luxury</p>
-                    <p className="detail-tag">Premium Travel</p>
+                  <div className="trip-card-info">
+                    <h3>Arupadai Veedu Trip</h3>
+                    <p><i className="fas fa-gopuram"></i> 6 Temples &bull; 1200 km</p>
+                    <div className="trip-card-price">Starting from <strong>₹{(tripData['Arupadai Veedu Trip'].distance * carOptions[0].rate).toLocaleString()}</strong></div>
+                    <button className="btn btn-trip" onClick={(e) => openBookingModal('Arupadai Veedu Trip', e)}>Book Now <i className="fas fa-arrow-right"></i></button>
                   </div>
-                </div>
-                <div className="category-footer">
-                  <button className="btn btn-primary btn-sm">View More</button>
                 </div>
               </div>
 
-              <div className="car-category featured">
-                <div className="featured-badge">
-                  <i className="fas fa-star"></i>
-                </div>
-                <div className="category-header">
-                  <h3>Prestige Cars</h3>
-                  <span className="duration">Starts 30 min</span>
-                </div>
-                <div className="category-body">
-                  <div className="car-image">
-                    <i className="fas fa-car"></i>
+              <div className="trip-card trip-card-featured" onClick={handleStartJourney}>
+                <div className="trip-featured-badge"><i className="fas fa-fire"></i> Popular</div>
+                <img src="/images/Sabarimalai.jpg" alt="Sabarimalai Trip" className="trip-card-img" />
+                <div className="trip-card-overlay">
+                  <div className="trip-card-tags">
+                    <span className="trip-tag">Pilgrimage</span>
+                    <span className="trip-tag">2-4 Days</span>
                   </div>
-                  <div className="category-details">
-                    <p className="detail-tag">Premium</p>
-                    <p className="detail-tag">Luxury Travel</p>
+                  <div className="trip-card-info">
+                    <h3>Sabarimalai Trip</h3>
+                    <p><i className="fas fa-star"></i> Most Popular &bull; 900 km</p>
+                    <div className="trip-card-price">Starting from <strong>₹{(tripData['Sabarimalai Trip'].distance * carOptions[0].rate).toLocaleString()}</strong></div>
+                    <button className="btn btn-trip" onClick={(e) => openBookingModal('Sabarimalai Trip', e)}>Book Now <i className="fas fa-arrow-right"></i></button>
                   </div>
-                </div>
-                <div className="category-footer">
-                  <button className="btn btn-primary btn-sm">Book Now</button>
                 </div>
               </div>
 
-              <div className="car-category">
-                <div className="category-header">
-                  <h3>Economy Cars</h3>
-                  <span className="duration">Mar 28 Ago</span>
-                </div>
-                <div className="category-body">
-                  <div className="car-image">
-                    <i className="fas fa-car"></i>
+              <div className="trip-card" onClick={handleStartJourney}>
+                <img src="/images/Navagraham.jpg" alt="Navagraham Trip" className="trip-card-img" />
+                <div className="trip-card-overlay">
+                  <div className="trip-card-tags">
+                    <span className="trip-tag">Pilgrimage</span>
+                    <span className="trip-tag">2-3 Days</span>
                   </div>
-                  <div className="category-details">
-                    <p className="detail-tag">Budget</p>
-                    <p className="detail-tag">Daily Rental</p>
+                  <div className="trip-card-info">
+                    <h3>Navagraham Trip</h3>
+                    <p><i className="fas fa-gopuram"></i> 9 Temples &bull; 800 km</p>
+                    <div className="trip-card-price">Starting from <strong>₹{(tripData['Navagraham Trip'].distance * carOptions[0].rate).toLocaleString()}</strong></div>
+                    <button className="btn btn-trip" onClick={(e) => openBookingModal('Navagraham Trip', e)}>Book Now <i className="fas fa-arrow-right"></i></button>
                   </div>
-                </div>
-                <div className="category-footer">
-                  <button className="btn btn-primary btn-sm">View More</button>
                 </div>
               </div>
+
+              <div className="trip-card" onClick={handleStartJourney}>
+                <img src="/images/kumbakonam.jpg" alt="Kumbakonam Trip" className="trip-card-img" />
+                <div className="trip-card-overlay">
+                  <div className="trip-card-tags">
+                    <span className="trip-tag">Heritage</span>
+                    <span className="trip-tag">2-3 Days</span>
+                  </div>
+                  <div className="trip-card-info">
+                    <h3>Kumbakonam Trip</h3>
+                    <p><i className="fas fa-gopuram"></i> Temple Town &bull; 600 km</p>
+                    <div className="trip-card-price">Starting from <strong>₹{(tripData['Kumbakonam Trip'].distance * carOptions[0].rate).toLocaleString()}</strong></div>
+                    <button className="btn btn-trip" onClick={(e) => openBookingModal('Kumbakonam Trip', e)}>Book Now <i className="fas fa-arrow-right"></i></button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="trip-card" onClick={handleStartJourney}>
+                <img src="/images/madurai.jpg" alt="Madurai Trip" className="trip-card-img" />
+                <div className="trip-card-overlay">
+                  <div className="trip-card-tags">
+                    <span className="trip-tag">Cultural</span>
+                    <span className="trip-tag">1-2 Days</span>
+                  </div>
+                  <div className="trip-card-info">
+                    <h3>Madurai Trip</h3>
+                    <p><i className="fas fa-gopuram"></i> Meenakshi Amman &bull; 500 km</p>
+                    <div className="trip-card-price">Starting from <strong>₹{(tripData['Madurai Trip'].distance * carOptions[0].rate).toLocaleString()}</strong></div>
+                    <button className="btn btn-trip" onClick={(e) => openBookingModal('Madurai Trip', e)}>Book Now <i className="fas fa-arrow-right"></i></button>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <button className="trip-scroll-btn trip-scroll-right" onClick={() => scrollTrips(1)}><i className="fas fa-chevron-right"></i></button>
             </div>
           </div>
         </section>
@@ -603,6 +718,116 @@ const CustomerLanding = () => {
           </div>
         </section>
       </div>
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="booking-modal-overlay" onClick={() => setShowBookingModal(false)}>
+          <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="booking-modal-header">
+              <h3><i className="fas fa-gopuram" style={{ marginRight: '0.5rem', color: 'var(--primary-blue)' }}></i>{selectedTrip}</h3>
+              <button className="booking-modal-close" onClick={() => setShowBookingModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="booking-modal-body">
+              {/* Trip Info */}
+              <div className="trip-modal-info">
+                <div className="trip-modal-meta">
+                  <span><i className="fas fa-road"></i> {currentTrip.distance} km</span>
+                  <span><i className="fas fa-calendar-alt"></i> {currentTrip.days}</span>
+                </div>
+                <p className="trip-modal-desc">{currentTrip.description}</p>
+              </div>
+
+              {/* Route */}
+              <div className="trip-route-section">
+                <label><i className="fas fa-route"></i> Route</label>
+                <div className="trip-route-stops">
+                  {(currentTrip.route || []).map((stop, i) => (
+                    <div key={i} className="trip-route-stop">
+                      <div className="route-dot-line">
+                        <span className={`route-dot ${i === 0 ? 'start' : i === currentTrip.route.length - 1 ? 'end' : ''}`}></span>
+                        {i < currentTrip.route.length - 1 && <span className="route-line"></span>}
+                      </div>
+                      <span className="route-stop-name">{stop}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Form Fields */}
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your name"
+                  value={modalForm.name}
+                  onChange={(e) => setModalForm({ ...modalForm, name: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  placeholder="Enter phone number"
+                  value={modalForm.phone}
+                  onChange={(e) => setModalForm({ ...modalForm, phone: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Travel Date</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={modalForm.date}
+                  onChange={(e) => setModalForm({ ...modalForm, date: e.target.value })}
+                />
+              </div>
+              <div className="form-group">
+                <label>Choose Car</label>
+                <div className="car-select-grid">
+                  {carOptions.map((car) => (
+                    <div
+                      key={car.id}
+                      className={`car-select-option ${modalForm.car === car.id ? 'selected' : ''}`}
+                      onClick={() => setModalForm({ ...modalForm, car: car.id })}
+                    >
+                      <i className={car.icon}></i>
+                      <span>{car.label}</span>
+                      <span className="car-rate">₹{car.rate}/km</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cost Summary */}
+              {modalForm.car && (
+                <div className="trip-cost-summary">
+                  <div className="trip-cost-row">
+                    <span>{currentTrip.distance} km × ₹{selectedCar?.rate}/km</span>
+                    <span>₹{tripCost.toLocaleString()}</span>
+                  </div>
+                  <div className="trip-cost-total">
+                    <span>Estimated Total</span>
+                    <strong>₹{tripCost.toLocaleString()}</strong>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="booking-modal-footer">
+              <button className="btn btn-primary" onClick={handleModalBook} disabled={modalLoading}>
+                {modalLoading ? (
+                  <><i className="fas fa-spinner fa-spin"></i> Booking...</>
+                ) : (
+                  <><i className="fas fa-check"></i> Book for {tripCost ? `₹${tripCost.toLocaleString()}` : 'Select Car'}</>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Call Button - Bottom Left */}
       <a
