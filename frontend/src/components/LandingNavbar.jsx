@@ -32,6 +32,8 @@ const LandingNavbar = () => {
           <Link to="/about-us" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
           <Link to="/rentals" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Rentals</Link>
           <Link to="/conditions" className="navbar-link" onClick={() => setIsMobileMenuOpen(false)}>Conditions</Link>
+          {!user && <Link to="/login" className="navbar-link mobile-only" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>}
+          {!user && <Link to="/register" className="navbar-link mobile-only" onClick={() => setIsMobileMenuOpen(false)}>Register</Link>}
         </div>
 
         <div className="navbar-actions">
@@ -52,7 +54,7 @@ const LandingNavbar = () => {
           ) : (
             <>
               <Link to="/login" className="navbar-link desktop-only">Login</Link>
-              <Link to="/register" className="btn btn-primary navbar-btn">
+              <Link to="/register" className="btn btn-primary navbar-btn desktop-only">
                 Register
               </Link>
             </>

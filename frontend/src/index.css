@@ -917,6 +917,10 @@ p { color: var(--gray-600); margin-bottom: 1rem; }
   display: inline;
 }
 
+.mobile-only {
+  display: none;
+}
+
 .navbar-link {
   color: var(--gray-700);
   text-decoration: none;
@@ -1882,6 +1886,10 @@ p { color: var(--gray-600); margin-bottom: 1rem; }
 
   .desktop-only {
     display: none;
+  }
+
+  .mobile-only {
+    display: block;
   }
 
   .navbar-actions {
