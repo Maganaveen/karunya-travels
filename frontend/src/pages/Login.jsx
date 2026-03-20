@@ -91,19 +91,15 @@ const Login = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="login-form">
               <div className="form-group">
-                <label>Email Address</label>
+                <label>Name or Email</label>
                 <div className="input-wrapper">
-                  <i className="fas fa-envelope"></i>
+                  <i className="fas fa-user"></i>
                   <input
-                    type="email"
+                    type="text"
                     className="form-control"
-                    placeholder="Enter your email"
+                    placeholder="Enter your name or email"
                     {...register('email', { 
-                      required: 'Email is required',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Invalid email address'
-                      }
+                      required: 'Name or email is required'
                     })}
                   />
                 </div>

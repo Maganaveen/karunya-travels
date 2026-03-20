@@ -71,8 +71,11 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email });
+    // Find user by email or name
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const user = isEmail
+      ? await User.findOne({ email: email.toLowerCase() })
+      : await User.findOne({ name: { $regex: new RegExp(`^${email}$`, 'i') } });
     if (!user || !user.isActive) {
       return res.status(401).json({ message: 'Invalid credentials or account deactivated' });
     }
