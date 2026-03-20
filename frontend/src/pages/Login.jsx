@@ -36,7 +36,12 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await authAPI.login(data);
-      const { token, user } = response.data;
+      const { token, user } = response.data || {};
+
+      if (!token || !user) {
+        toast.error('Login failed: Invalid response from server');
+        return;
+      }
 
       login(token, user);
       toast.success('Login successful!');
